@@ -1,17 +1,15 @@
 ## inventory_bom_app/backend/main.py
 from fastapi import FastAPI
 from backend.database import engine, Base
-from backend.routers import items, warehouses, bom, inventory
+from backend.routers import item
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Manufacturing Inventory System")
 
 # Include routers
-app.include_router(items.router, prefix="/items", tags=["Items"])
-app.include_router(warehouses.router, prefix="/warehouses", tags=["Warehouses"])
-app.include_router(bom.router, prefix="/bom", tags=["Bill of Materials"])
-app.include_router(inventory.router, prefix="/inventory", tags=["Inventory Transactions"])
+app.include_router(item.router)
+
 
 @app.get("/")
 def read_root():
