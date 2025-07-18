@@ -1,10 +1,10 @@
-## inventory_bom_app/backend/routers/bom.py
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from backend.database import SessionLocal
-from backend import models
+from backend.schemas import bom as bom_schema
+from backend.crud import bom as bom_crud
 
-router = APIRouter()
+router = APIRouter(prefix="/boms", tags=["boms"])
 
 def get_db():
     db = SessionLocal()
@@ -13,14 +13,14 @@ def get_db():
     finally:
         db.close()
 
-@router.post("/")
-def create_bom(bom: dict, db: Session = Depends(get_db)):
-    db_bom = models.BOM(**bom)
-    db.add(db_bom)
-    db.commit()
-    db.refresh(db_bom)
-    return db_bom
+@router.post("/", response_model=bom_schema.BOMOut)
+def create_bom(bom: bom_schema.BOMCreate, db: Session = Depends(get_db)):
+    return bom_crud.create_bom(db, bom)
 
-@router.get("/")
-def list_bom(db: Session = Depends(get_db)):
-    return db.query(models.BOM).all()
+@router.get("/", response_model=list[bom_schema.BOMOut])
+def read_boms(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+    return bom_crud.get_boms(db, skip, limit)
+
+@router.get("/{bom_id}", response_model=bom_schema.BOMOut)
+def read_bom(bom_id: int, db: Session = Depends(get_db)):
+    return bom_crud.get_bom(db, bom_id)

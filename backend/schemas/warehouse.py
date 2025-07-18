@@ -1,8 +1,9 @@
 from pydantic import BaseModel
+from typing import Optional
 
 class WarehouseBase(BaseModel):
-    code: str
-    name: str
+    name: Optional [str] = None
+    location: str
 
 class WarehouseCreate(WarehouseBase):
     pass
