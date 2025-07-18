@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from backend.database import engine, Base
 from backend.routers import item
 
+
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Manufacturing Inventory System")

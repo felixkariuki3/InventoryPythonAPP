@@ -2,7 +2,6 @@
 from sqlalchemy import Column, Integer, String, Float, ForeignKey
 from sqlalchemy.orm import relationship
 from backend.database import Base
-from backend.models.warehouse import Warehouse
 
 class Item(Base):
     __tablename__ = "items"
