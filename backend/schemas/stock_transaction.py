@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from datetime import datetime
 from typing import Optional
 
@@ -30,3 +30,21 @@ class InventoryLogOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+class TransferTransaction(BaseModel):
+    item_id: int
+    source_warehouse_id: int
+    destination_warehouse_id: int
+    quantity: float
+    reference: Optional[str] = None
+class IssueCreate(BaseModel):
+    item_id: int
+    warehouse_id: int
+    quantity: int
+    reference: Optional[str] = None
+
+    @field_validator("quantity")
+    def validate_quantity(cls, value):
+        if value <= 0:
+            raise ValueError("Quantity must be greater than zero")
+        return value
