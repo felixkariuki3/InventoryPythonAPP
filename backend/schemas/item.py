@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import Optional
 
 class ItemBase(BaseModel):
+    item_id: int
     name: str
     description: Optional[str] = None
     quantity: int

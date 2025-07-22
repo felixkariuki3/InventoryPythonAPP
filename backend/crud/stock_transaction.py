@@ -91,7 +91,9 @@ def create_issue(db: Session, txn: transaction_schema.IssueCreate):
     item_wh = db.query(InventoryTransaction).filter_by(
         item_id=txn.item_id,
         warehouse_id=txn.warehouse_id
+        
     ).first()
+    print("Trying to find Inventory with item_id =", txn.item_id, "and warehouse_id =", txn.warehouse_id)
 
     if not item_wh or item_wh.quantity < txn.quantity:
         raise HTTPException(status_code=400, detail="Insufficient stock")
@@ -103,9 +105,9 @@ def create_issue(db: Session, txn: transaction_schema.IssueCreate):
     log = InventoryLog(
         item_id=txn.item_id,
         warehouse_id=txn.warehouse_id,
-        quantity=-txn.quantity,
-        transaction_type="issue",
-        reference=txn.reference,
+        change=-txn.quantity,
+        note="issue",
+        transaction_id=None,
     )
     db.add(log)
     db.commit()

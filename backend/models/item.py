@@ -8,6 +8,7 @@ class Item(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, index=True)
+    item_id = Column(Integer, ForeignKey("items.id"))
     description = Column(String)
     quantity = Column(Integer)
     warehouse_id = Column(Integer, ForeignKey("warehouses.id"))
