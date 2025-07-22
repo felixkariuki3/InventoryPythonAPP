@@ -101,13 +101,23 @@ def create_issue(db: Session, txn: transaction_schema.IssueCreate):
     item_wh.quantity -= txn.quantity
     db.commit()
     db.refresh(item_wh)
+    
+    db_txn = Transaction(
+        item_id=txn.item_id,
+        warehouse_id=txn.warehouse_id,
+        type="issue",
+        quantity=txn.quantity,
+        reference=txn.reference,
+    )
+    db.add(db_txn)
+    db.flush() 
 
     log = InventoryLog(
         item_id=txn.item_id,
         warehouse_id=txn.warehouse_id,
         change=-txn.quantity,
         note="issue",
-        transaction_id=None,
+        transaction_id=db_txn.id,
     )
     db.add(log)
     db.commit()

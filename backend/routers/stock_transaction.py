@@ -30,6 +30,6 @@ def list_logs(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
 def transfer_items(txn: TransferTransaction, db: Session = Depends(get_db)):
     return transaction_crud.create_transfer(db, txn)
 
-@router.post("/issue", response_model=transaction_schema.TransactionOut)
+@router.post("/issue", response_model=transaction_schema.InventoryLogOut)
 def issue_item(txn: transaction_schema.IssueCreate, db: Session = Depends(get_db)):
     return transaction_crud.create_issue(db, txn)
