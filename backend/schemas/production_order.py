@@ -1,32 +1,37 @@
-# backend/schemas/production_order.py
-
+# backend/schemas/production.py
 from pydantic import BaseModel
+from typing import List, Optional
 from datetime import datetime
 from enum import Enum
-from typing import Optional
 
-class OrderStatus(str, Enum):
-    planned = "planned"
-    in_progress = "in_progress"
-    completed = "completed"
-    cancelled = "cancelled"
+
+class ProductionStatus(str, Enum):
+    planned = "Planned"
+    in_progress = "In Progress"
+    completed = "Completed"
+    cancelled = "Cancelled"
+
+
+class ProductionOperationCreate(BaseModel):
+    name: str
+    sequence: int
+    duration_minutes: float
+
 
 class ProductionOrderCreate(BaseModel):
     item_id: int
     quantity: float
-    scheduled_date: Optional[datetime] = None
-    note: Optional[str] = None
+    operations: List[ProductionOperationCreate]
 
-class ProductionOrderOut(BaseModel):
+
+class ProductionOrderResponse(BaseModel):
     id: int
     item_id: int
     quantity: float
-    status: OrderStatus
-    scheduled_date: Optional[datetime]
-    started_at: Optional[datetime]
-    completed_at: Optional[datetime]
-    note: Optional[str]
-    created_at: datetime
+    status: ProductionStatus
+    start_date: datetime
+    end_date: Optional[datetime]
+    operations: List[ProductionOperationCreate]
 
     class Config:
         from_attributes = True

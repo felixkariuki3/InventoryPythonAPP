@@ -5,6 +5,7 @@ from backend.routers import item
 from backend.routers import warehouse
 from backend.routers import bom
 from backend.routers import stock_transaction
+from backend.routers import production_order
 
 
 Base.metadata.create_all(bind=engine)
@@ -16,6 +17,7 @@ app.include_router(item.router)
 app.include_router(warehouse.router)
 app.include_router(bom.router)
 app.include_router(stock_transaction.router)
+app.include_router(production_order.router)
 
 
 @app.get("/")

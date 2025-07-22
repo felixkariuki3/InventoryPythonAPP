@@ -1,28 +1,39 @@
-# backend/models/production_order.py
-
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Float, Enum
+# backend/models/production.py
+from sqlalchemy import Column, Integer, Float, ForeignKey, String, DateTime, Enum
 from sqlalchemy.orm import relationship
-from datetime import datetime
 from backend.database import Base
 import enum
+import datetime
 
-class OrderStatus(str, enum.Enum):
-    planned = "planned"
-    in_progress = "in_progress"
-    completed = "completed"
-    cancelled = "cancelled"
+
+class ProductionStatus(str, enum.Enum):
+    planned = "Planned"
+    in_progress = "In Progress"
+    completed = "Completed"
+    cancelled = "Cancelled"
+
 
 class ProductionOrder(Base):
     __tablename__ = "production_orders"
 
     id = Column(Integer, primary_key=True, index=True)
-    item_id = Column(Integer, ForeignKey("items.id"), nullable=False)
-    quantity = Column(Float, nullable=False)
-    status = Column(Enum(OrderStatus), default=OrderStatus.planned)
-    scheduled_date = Column(DateTime, nullable=True)
-    started_at = Column(DateTime, nullable=True)
-    completed_at = Column(DateTime, nullable=True)
-    note = Column(String, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    item_id = Column(Integer, ForeignKey("items.id"))
+    quantity = Column(Float)
+    status = Column(Enum(ProductionStatus), default=ProductionStatus.planned)
+    start_date = Column(DateTime, default=datetime.datetime.utcnow)
+    end_date = Column(DateTime, nullable=True)
 
     item = relationship("Item")
+    operations = relationship("ProductionOperation", back_populates="order", cascade="all, delete")
+
+
+class ProductionOperation(Base):
+    __tablename__ = "production_operations"
+
+    id = Column(Integer, primary_key=True, index=True)
+    order_id = Column(Integer, ForeignKey("production_orders.id"))
+    name = Column(String)
+    sequence = Column(Integer)
+    duration_minutes = Column(Float)
+
+    order = relationship("ProductionOrder", back_populates="operations")
