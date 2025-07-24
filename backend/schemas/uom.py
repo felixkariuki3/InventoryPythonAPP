@@ -1,27 +1,27 @@
 from pydantic import BaseModel
 
-class UOMCreate(BaseModel):
+class UOMBase(BaseModel):
     name: str
     symbol: str
 
-class UOMConversionCreate(BaseModel):
-    base_uom_id: int
-    target_uom: str
-    factor: float
+class UOMCreate(UOMBase):
+    pass
 
-class UOMOut(BaseModel):
+class UOMOut(UOMBase):
     id: int
-    name: str
-    symbol: str
-
     class Config:
         from_attributes = True
 
-class UOMConversionOut(BaseModel):
-    id: int
-    base_uom_id: int
-    target_uom: str
+class UOMConversionBase(BaseModel):
+    item_id: int
+    from_uom_id: int
+    to_uom_id: int
     factor: float
 
+class UOMConversionCreate(UOMConversionBase):
+    pass
+
+class UOMConversionOut(UOMConversionBase):
+    id: int
     class Config:
         from_attributes = True
