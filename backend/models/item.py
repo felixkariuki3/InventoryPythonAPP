@@ -12,8 +12,10 @@ class Item(Base):
     description = Column(String)
     quantity = Column(Integer)
     warehouse_id = Column(Integer, ForeignKey("warehouses.id"))
-    default_uom_id = Column(Integer, ForeignKey("units_of_measure.id"))
+    default_uom_id = Column(Integer, ForeignKey("uoms.id"))
     
     default_uom = relationship("UnitOfMeasure")
 
     warehouse = relationship("Warehouse", back_populates="items")
+    
+    conversions = relationship("UOMConversion", back_populates="item")
