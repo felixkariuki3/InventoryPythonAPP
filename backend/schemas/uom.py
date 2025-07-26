@@ -14,8 +14,8 @@ class UOMOut(UOMBase):
 
 class UOMConversionBase(BaseModel):
     item_id: int
-    from_uom_id: int
-    to_uom_id: int
+    base_uom_id: int
+    target_uom: int
     factor: float
 
 class UOMConversionCreate(UOMConversionBase):

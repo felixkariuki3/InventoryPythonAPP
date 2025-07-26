@@ -7,10 +7,10 @@ class UOMConversion(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     item_id = Column(Integer, ForeignKey("items.id"))
-    from_uom_id = Column(Integer, ForeignKey("uoms.id"))
-    to_uom_id = Column(Integer, ForeignKey("uoms.id"))
+    base_uom_id = Column(Integer, ForeignKey("uoms.id"))
+    target_uom = Column(Integer, ForeignKey("uoms.id"))
     factor = Column(Float, nullable=False)
 
     item = relationship("Item", back_populates="conversions")
-    from_uom = relationship("UnitOfMeasure", foreign_keys=[from_uom_id])
-    to_uom = relationship("UnitOfMeasure", foreign_keys=[to_uom_id])
+    from_uom = relationship("UnitOfMeasure", foreign_keys=[base_uom_id])
+    to_uom = relationship("UnitOfMeasure", foreign_keys=[target_uom])
