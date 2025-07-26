@@ -11,6 +11,7 @@ def create_uom(db: Session, uom: UOMCreate) -> UnitOfMeasure:
 
 def create_conversion(db: Session, conv: UOMConversionCreate) -> UOMConversion:
     new_conv = UOMConversion(
+        item_id = conv.item_id,
         base_uom_id=conv.base_uom_id,
         target_uom=conv.target_uom,
         factor=conv.factor

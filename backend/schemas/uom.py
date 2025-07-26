@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel
 
 class UOMBase(BaseModel):
@@ -13,13 +14,13 @@ class UOMOut(UOMBase):
         from_attributes = True
 
 class UOMConversionBase(BaseModel):
-    item_id: int
+    item_id: Optional[int]
     base_uom_id: int
     target_uom: int
     factor: float
 
 class UOMConversionCreate(UOMConversionBase):
-    pass
+    item_id: int
 
 class UOMConversionOut(UOMConversionBase):
     id: int
