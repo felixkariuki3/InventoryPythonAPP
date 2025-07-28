@@ -11,6 +11,7 @@ class Item(Base):
     item_id = Column(Integer, ForeignKey("items.id"))
     description = Column(String)
     quantity = Column(Integer)
+    average_cost = Column(Float, default=0.0)
     warehouse_id = Column(Integer, ForeignKey("warehouses.id"))
     default_uom_id = Column(Integer, ForeignKey("uoms.id"),nullable = True)
     

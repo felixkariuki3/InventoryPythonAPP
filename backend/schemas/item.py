@@ -7,6 +7,8 @@ class ItemBase(BaseModel):
     description: Optional[str] = None
     quantity: int
     warehouse_id: int
+    average_cost: float
+
 
 class ItemCreate(ItemBase):
     pass
