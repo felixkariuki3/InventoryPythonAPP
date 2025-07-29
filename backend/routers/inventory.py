@@ -3,6 +3,9 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from backend.database import SessionLocal
 from backend import models
+from backend.models.item import Item
+from utils.costing import calculate_weighted_average
+from utils.costing import update_item_average_cost
 
 router = APIRouter()
 
@@ -20,7 +23,17 @@ def create_transaction(txn: dict, db: Session = Depends(get_db)):
     db.add(db_txn)
     db.commit()
     db.refresh(db_txn)
+    
+
+    if db_txn.transaction_type== "receipt":
+        update_item_average_cost(
+            db,
+            item_id=db_txn.item_id,
+            received_cost=db_txn.cost,
+            received_qty=db_txn.quantity,
+            )
     return db_txn
+
 
 @router.get("/")
 def list_transactions(db: Session = Depends(get_db)):

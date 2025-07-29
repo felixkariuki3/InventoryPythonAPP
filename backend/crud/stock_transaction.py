@@ -7,6 +7,7 @@ from backend.schemas.stock_transaction import TransactionCreate
 from backend.schemas import stock_transaction as transaction_schema
 from sqlalchemy import func
 from backend.models.inventory import InventoryTransaction
+from backend.routers.inventory import update_item_average_cost
 
 
 
@@ -25,6 +26,7 @@ def create_transaction(db: Session, txn: TransactionCreate):
     db.commit()
     db.refresh(db_txn)
     return db_txn
+
 
 def create_transfer(db: Session, txn: TransferTransaction):
     
