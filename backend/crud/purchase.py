@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from backend.models.purchase import PurchaseOrder, PurchaseOrderItem
-from schemas.purchase import PurchaseOrderCreate, PurchaseItemCreate
+from backend.models.purchase import PurchaseOrder, PurchaseOrderLine
+from backend.schemas.purchase import PurchaseOrderCreate, PurchaseOrderLineCreate
 
 def create_purchase_order(db: Session, order_data: PurchaseOrderCreate):
     db_order = PurchaseOrder(
@@ -11,6 +11,18 @@ def create_purchase_order(db: Session, order_data: PurchaseOrderCreate):
     db.add(db_order)
     db.commit()
     db.refresh(db_order)
+
+    for line in order_data.lines:
+        db_line = PurchaseOrderLine(
+            order_id=db_order.id,
+            item_id=line.item_id,
+            quantity=line.quantity,
+            unit_cost=line.unit_cost
+        )
+        db.add(db_line)
+
+    db.commit()
+    db.refresh(db_order)
     return db_order
 
 def get_purchase_order(db: Session, order_id: int):
@@ -19,8 +31,8 @@ def get_purchase_order(db: Session, order_id: int):
 def list_purchase_orders(db: Session):
     return db.query(PurchaseOrder).all()
 
-def add_purchase_item(db: Session, order_id: int, item: PurchaseItemCreate):
-    db_item = PurchaseOrderItem(
+def add_purchase_item(db: Session, order_id: int, item: PurchaseOrderLineCreate):
+    db_item = PurchaseOrderLineCreate(
         purchase_order_id=order_id,
         item_id=item.item_id,
         quantity=item.quantity,
@@ -32,4 +44,4 @@ def add_purchase_item(db: Session, order_id: int, item: PurchaseItemCreate):
     return db_item
 
 def list_order_items(db: Session, order_id: int):
-    return db.query(PurchaseOrderItem).filter(PurchaseOrderItem.purchase_order_id == order_id).all()
+    return db.query(PurchaseOrderLineCreate).filter(PurchaseOrderLineCreate.purchase_order_id == order_id).all()

@@ -1,23 +1,26 @@
 # backend/schemas/purchase.py
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 from datetime import datetime
 
 class PurchaseOrderLineCreate(BaseModel):
     item_id: int
     quantity: float
     unit_cost: float
+    warehouse_id : int
 
 class PurchaseOrderCreate(BaseModel):
-    supplier_name: str
+    supplier_id: str
     lines: List[PurchaseOrderLineCreate]
+    order_date: Optional[datetime]= None
+    status:Optional[str]
 
 class PurchaseOrderLineOut(PurchaseOrderLineCreate):
     id: int
 
 class PurchaseOrderOut(BaseModel):
     id: int
-    supplier_name: str
+    supplier_id: str
     order_date: datetime
     status: str
     lines: List[PurchaseOrderLineOut]

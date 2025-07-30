@@ -14,7 +14,7 @@ def update_item_average_cost(db: Session, item_id: int, received_qty: float, rec
     item = db.query(Item).filter(Item.id == item_id).first()
 
     if item:
-        current_qty = item.quantity_on_hand or 0
+        current_qty = item.quantity or 0
         current_cost = item.average_cost or 0.0
 
         new_avg_cost = calculate_weighted_average(current_qty, current_cost, received_qty, received_cost)
