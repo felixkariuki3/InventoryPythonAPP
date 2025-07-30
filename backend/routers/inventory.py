@@ -2,10 +2,11 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from backend.database import SessionLocal
-from backend import models
+from backend.models.inventory import InventoryTransaction
 from backend.models.item import Item
 from utils.costing import calculate_weighted_average
 from utils.costing import update_item_average_cost
+from backend.schemas.stock_transaction import TransactionCreate
 
 router = APIRouter()
 
@@ -18,8 +19,8 @@ def get_db():
 
 @router.post("/")
 
-def create_transaction(txn: dict, db: Session = Depends(get_db)):
-    db_txn = models.InventoryTransaction(**txn)
+def create_transaction(txn: TransactionCreate, db: Session = Depends(get_db)):
+    db_txn = InventoryTransaction(**txn)
     db.add(db_txn)
     db.commit()
     db.refresh(db_txn)
@@ -37,4 +38,4 @@ def create_transaction(txn: dict, db: Session = Depends(get_db)):
 
 @router.get("/")
 def list_transactions(db: Session = Depends(get_db)):
-    return db.query(models.InventoryTransaction).all()
+    return db.query(InventoryTransaction).all()

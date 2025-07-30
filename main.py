@@ -8,6 +8,7 @@ from backend.routers import stock_transaction
 from backend.routers import production_order
 from backend.routers import wip
 from backend.routers import uom
+from backend.routers import purchase
 
 
 Base.metadata.create_all(bind=engine)
@@ -22,6 +23,7 @@ app.include_router(stock_transaction.router)
 app.include_router(production_order.router)
 app.include_router(wip.router)
 app.include_router(uom.router)
+app.include_router(purchase.router)
 
 
 @app.get("/")

@@ -1,13 +1,14 @@
 from pydantic import BaseModel, field_validator
 from datetime import datetime
-from typing import Optional
+from typing import Literal, Optional
 
 class TransactionBase(BaseModel):
     item_id: int
     warehouse_id: int
-    type: str
+    type: Literal["receipt", "issue", "adjustment", "transfer"]
     quantity: float
     reference: Optional[str] = None
+    unit_cost: Optional[float] = None
 
 class TransactionCreate(TransactionBase):
     pass
