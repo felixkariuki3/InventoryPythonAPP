@@ -35,3 +35,11 @@ class ProductionOrderResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class ProductionStartRequest(BaseModel):
+    order_id: int
+
+class ProductionCompleteRequest(BaseModel):
+    order_id: int
+    completed_quantity: float
+

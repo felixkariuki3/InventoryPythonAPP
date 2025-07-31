@@ -36,6 +36,7 @@ def receive_purchase_order(db: Session, order_id: int):
         item.average_cost = new_avg
 
         db.add(item)
+
         InventoryLog(
         db=db,
         item_id=item.id,
