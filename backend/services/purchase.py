@@ -39,8 +39,8 @@ def receive_purchase_order(db: Session, order_id: int):
         InventoryLog(
         db=db,
         item_id=item.id,
-        warehouse_id=1,  # Replace with actual warehouse if tracked
-        quantity=line.quantity,
+        warehouse_id=item.warehouse_id,  # Replace with actual warehouse if tracked
+        quantity=PurchaseOrderLine.quantity,
         note=f"PO #{order.id} received"
         )
     order.status = "received"
