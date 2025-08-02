@@ -11,6 +11,7 @@ class InventoryTransaction(Base):
     warehouse_id = Column(Integer, ForeignKey("warehouses.id"))
     quantity = Column(Float)
     transaction_type = Column(String)  # e.g. receipt, issue, transfer
+    reference = Column(String)
 
     item = relationship("Item")
     warehouse = relationship("Warehouse")

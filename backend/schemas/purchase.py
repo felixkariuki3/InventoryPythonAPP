@@ -7,7 +7,7 @@ class PurchaseOrderLineCreate(BaseModel):
     item_id: int
     quantity: float
     unit_cost: float
-    warehouse_id : int
+    warehouse_id : Optional[int]
 
 class PurchaseOrderCreate(BaseModel):
     supplier_id: str

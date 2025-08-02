@@ -16,8 +16,8 @@ class ItemCreate(ItemBase):
 class ItemOut(ItemBase):
     id: int
     name: str
-    code: str
-    quantity_on_hand: float
+    item_id: int
+    quantity: float
     average_cost: Optional[float] = None
 
     class Config:

@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from backend.models import production_order, item, stock_transaction, bom
+from backend.models.wip import WorkInProgress
 from backend.models.inventory import InventoryTransaction
 from utils.costing import calculate_weighted_average
 from datetime import datetime
@@ -19,7 +20,7 @@ def start_production_order(db: Session, order_id: int):
             item_id=component.component_item_id,
             warehouse_id=1,
             quantity=-qty_needed,
-            type="issue",
+            transaction_type="issue",
             reference=f"Production Order #{order.id}",
         ))
         db.add(stock_transaction.InventoryLog(
@@ -34,7 +35,7 @@ def start_production_order(db: Session, order_id: int):
         item_record.quantity -= qty_needed
 
     # Start tracking
-    wip = production_order.WorkInProgress(production_order_id=order.id)
+    wip = WorkInProgress(production_order_id=order.id)
     db.add(wip)
     order.status = production_order.ProductionStatus.in_progress
 
@@ -53,7 +54,7 @@ def complete_production_order(db: Session, order_id: int, completed_quantity: fl
         item_id=order.item_id,
         warehouse_id=1,
         quantity=completed_quantity,
-        type="receipt",
+        transaction_type="receipt",
         reference=f"Production Order #{order.id}",
     ))
     db.add(stock_transaction.InventoryLog(

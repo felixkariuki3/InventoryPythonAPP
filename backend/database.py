@@ -11,4 +11,4 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 
-from backend.models import item, warehouse
+from backend.models import item, warehouse,bom,production_order,purchase
