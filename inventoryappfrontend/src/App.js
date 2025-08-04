@@ -6,11 +6,15 @@ import CreateProductionOrder from "./components/CreateProductionOrder";
 function App() {
   return (
     <div className="max-w-3xl mx-auto mt-10">
+       <h1 className="text-4xl font-bold text-blue-600">
+        Tailwind is Working!
+      </h1>
       <ProductionStartForm />
       <ProductionCompletionForm />
       <ProductionList />
       <CreateProductionOrder/> 
     </div>
+    
   );
 }
 
