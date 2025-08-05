@@ -21,7 +21,7 @@ class ProductionOperationCreate(BaseModel):
 class ProductionOrderCreate(BaseModel):
     item_id: int
     quantity: float
-    operations: List[ProductionOperationCreate]
+    operations:Optional [List[ProductionOperationCreate]]
 
 
 class ProductionOrderResponse(BaseModel):

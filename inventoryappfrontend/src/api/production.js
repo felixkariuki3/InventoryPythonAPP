@@ -9,3 +9,4 @@ export const startProduction = (orderId) =>
 
 export const completeProduction = (orderId, completed_quantity) =>
   API.post("/production/complete", { order_id: orderId, completed_quantity });
+

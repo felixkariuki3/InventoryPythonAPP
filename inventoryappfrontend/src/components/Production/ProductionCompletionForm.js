@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { completeProduction } from "../api/production";
+import { completeProduction } from "../../api/production";
 
 const ProductionCompletionForm = () => {
   const [orderId, setOrderId] = useState("");
