@@ -1,4 +1,5 @@
 # backend/routers/production.py
+from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from backend.schemas import production_order as schemas
@@ -6,6 +7,8 @@ from backend.crud import production_order as crud
 from backend.dependencies import get_db
 from backend.services import production_service
 from backend.schemas.production_order import ProductionStartRequest, ProductionCompleteRequest
+from backend.models.wip import WorkInProgress
+from backend.schemas.wip import WIPEntry
 
 router = APIRouter(prefix="/production", tags=["Production"])
 
@@ -28,3 +31,9 @@ def start_order(data: ProductionStartRequest, db: Session = Depends(get_db)):
 def complete_order(data: ProductionCompleteRequest, db: Session = Depends(get_db)):
     production_service.complete_production_order(db, data.order_id, data.completed_quantity)
     return {"message": "Production completed"}
+# routers/production.py
+
+@router.get("/production/{order_id}/wip", response_model=List[WIPEntry])
+def get_wip_for_production_order(order_id: int, db: Session = Depends(get_db)):
+    wip_entries = db.query(WorkInProgress).filter(WorkInProgress.production_order_id == order_id).all()
+    return wip_entries

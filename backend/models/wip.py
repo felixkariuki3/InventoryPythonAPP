@@ -10,9 +10,13 @@ class WorkInProgress(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     production_order_id = Column(Integer, ForeignKey("production_orders.id"))
+    item_id = Column(Integer, ForeignKey("items.id"), nullable=False)
     issued_quantity = Column(Float, default=0.0)
+    cost_per_unit = Column(Float, nullable=False)
+    total_cost = Column(Float, nullable=False)
     completed_quantity = Column(Float, default=0.0)
     status = Column(String, default="in_progress")  # in_progress, completed, scrapped, paused
     updated_at = Column(DateTime, default=datetime.utcnow)
 
+    item = relationship("Item")
     production_order = relationship("ProductionOrder", back_populates="wip")

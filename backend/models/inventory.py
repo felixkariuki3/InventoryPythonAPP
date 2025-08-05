@@ -1,5 +1,6 @@
 ## inventory_bom_app/backend/item.py
-from sqlalchemy import Column, Integer, String, Float, ForeignKey
+from datetime import datetime
+from sqlalchemy import Column, DateTime, Integer, String, Float, ForeignKey
 from sqlalchemy.orm import relationship
 from backend.database import Base
 

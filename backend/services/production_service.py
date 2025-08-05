@@ -2,6 +2,9 @@ from sqlalchemy.orm import Session
 from backend.models import production_order, item, stock_transaction, bom
 from backend.models.wip import WorkInProgress
 from backend.models.inventory import InventoryTransaction
+from backend.services.items import get_item
+from backend.services.inventory import update_inventory_quantity
+from backend.services.bom import get_bom_for_item
 from utils.costing import calculate_weighted_average
 from datetime import datetime
 
@@ -41,6 +44,35 @@ def start_production_order(db: Session, order_id: int):
 
     db.commit()
 
+    # services/production.py
+
+def issue_materials_for_production(db, production_order):
+    bom_items = get_bom_for_item(db, production_order.item_id)
+    for bom_item in bom_items:
+        # 1. Calculate quantity to issue
+        qty_to_issue = bom_item.quantity * production_order.quantity
+        
+        # 2. Fetch current cost
+        item = get_item(db, bom_item.component_item_id)
+        cost_per_unit = item.average_cost or 0.0
+        total_cost = qty_to_issue * cost_per_unit
+        
+        # 3. Reduce inventory
+        update_inventory_quantity(db, item.id, -qty_to_issue)
+        
+        # 4. Log to WIP
+        wip_entry = WorkInProgress(
+            production_order_id=production_order.id,
+            item_id=item.item.id,
+            quantity_issued=qty_to_issue,
+            cost_per_unit=cost_per_unit,
+            total_cost=total_cost
+        )
+        db.add(wip_entry)
+    
+    db.commit()
+
+
 def complete_production_order(db: Session, order_id: int, completed_quantity: float):
     order = db.query(production_order.ProductionOrder).filter_by(id=order_id).first()
     if not order or not order.wip:
@@ -50,6 +82,16 @@ def complete_production_order(db: Session, order_id: int, completed_quantity: fl
     order.status = production_order.ProductionStatus.completed
     order.end_date = datetime.utcnow()
 
+    # 1. Calculate total WIP cost for this order
+    wip_entries = db.query(WorkInProgress).filter_by(production_order_id=order.id).all()
+    total_wip_cost = sum(w.total_cost for w in wip_entries)
+
+    # 2. Determine unit cost of finished goods
+    if completed_quantity <= 0:
+        raise Exception("Completed quantity must be greater than 0 to calculate unit cost.")
+    cost_per_unit = total_wip_cost / completed_quantity
+
+    # 3. Log inventory receipt transaction
     db.add(InventoryTransaction(
         item_id=order.item_id,
         warehouse_id=1,
@@ -57,6 +99,8 @@ def complete_production_order(db: Session, order_id: int, completed_quantity: fl
         transaction_type="receipt",
         reference=f"Production Order #{order.id}",
     ))
+
+    # 4. Log inventory change (your custom log)
     db.add(stock_transaction.InventoryLog(
         item_id=order.item_id,
         warehouse_id=1,
@@ -66,12 +110,14 @@ def complete_production_order(db: Session, order_id: int, completed_quantity: fl
         timestamp=datetime.utcnow()
     ))
 
+    # 5. Update item quantity and average cost
     item_record = db.query(item.Item).filter_by(id=order.item_id).first()
     current_qty = item_record.quantity or 0
     current_cost = item_record.average_cost or 0.0
-    received_cost = current_cost  # You can enhance this later
-
     item_record.quantity += completed_quantity
-    item_record.average_cost = calculate_weighted_average(current_qty, current_cost, completed_quantity, received_cost)
+    item_record.average_cost = calculate_weighted_average(
+        current_qty, current_cost,
+        completed_quantity, cost_per_unit
+    )
 
     db.commit()

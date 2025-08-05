@@ -23,3 +23,18 @@ class WIPOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+# schemas/wip.py
+
+class WIPEntry(BaseModel):
+    id: int
+    production_order_id: int
+    item_id: int
+    quantity_issued: float
+    cost_per_unit: float
+    total_cost: float
+    issued_at: datetime
+
+    class Config:
+        orm_mode = True
+
