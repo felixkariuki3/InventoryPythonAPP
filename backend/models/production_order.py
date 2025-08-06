@@ -17,7 +17,7 @@ class ProductionOrder(Base):
     __tablename__ = "production_orders"
 
     id = Column(Integer, primary_key=True, index=True)
-    item_id = Column(Integer, ForeignKey("items.id"))
+    item_id = Column(Integer, ForeignKey("items.id"), nullable=False)
     quantity = Column(Float)
     status = Column(Enum(ProductionStatus), default=ProductionStatus.planned)
     start_date = Column(DateTime, default=datetime.datetime.utcnow)

@@ -1,5 +1,8 @@
 from sqlalchemy.orm import Session
-from backend.models import production_order, item, stock_transaction, bom
+from backend.models.production_order import ProductionOrder,ProductionOperation,ProductionStatus
+from backend.models.item import Item
+from backend.models.stock_transaction import InventoryLog, Transaction
+from backend.models.bom import BOM
 from backend.models.wip import WorkInProgress
 from backend.models.inventory import InventoryTransaction
 from backend.services.items import get_item
@@ -7,13 +10,14 @@ from backend.services.inventory import update_inventory_quantity
 from backend.services.bom import get_bom_for_item
 from utils.costing import calculate_weighted_average
 from datetime import datetime
+from pydantic import BaseModel, ConfigDict
 
 def start_production_order(db: Session, order_id: int):
-    order = db.query(production_order.ProductionOrder).filter_by(id=order_id).first()
+    order = db.query(ProductionOrder).filter_by(id=order_id).first()
     if not order:
         raise Exception("Production order not found.")
 
-    bom_components = db.query(bom.BOM).filter(bom.BOM.parent_item_id == order.item_id).all()
+    bom_components = db.query(BOM).filter(BOM.parent_item_id == order.item_id).all()
     if not bom_components:
         raise Exception("No BOM found for this item.")
 
@@ -26,7 +30,7 @@ def start_production_order(db: Session, order_id: int):
             transaction_type="issue",
             reference=f"Production Order #{order.id}",
         ))
-        db.add(stock_transaction.InventoryLog(
+        db.add(InventoryLog(
             item_id=component.component_item_id,
             warehouse_id=1,
             transaction_id=0,  # Replace later if needed
@@ -34,23 +38,23 @@ def start_production_order(db: Session, order_id: int):
             note=f"Issue for Production Order #{order.id}",
             timestamp=datetime.utcnow()
         ))
-        item_record = db.query(item.Item).filter_by(id=component.component_item_id).first()
+        item_record = db.query(Item).filter_by(id=component.component_item_id).first()
         item_record.quantity -= qty_needed
 
     # Start tracking
     wip = WorkInProgress(production_order_id=order.id)
     db.add(wip)
-    order.status = production_order.ProductionStatus.in_progress
+    order.status = ProductionStatus.in_progress
 
     db.commit()
 
     # services/production.py
 
-def issue_materials_for_production(db, production_order):
-    bom_items = get_bom_for_item(db, production_order.item_id)
+def issue_materials_for_production(db: Session, production_order: ProductionOrder):
+    bom_items = get_bom_for_item(db, ProductionOrder.item_id)
     for bom_item in bom_items:
         # 1. Calculate quantity to issue
-        qty_to_issue = bom_item.quantity * production_order.quantity
+        qty_to_issue = bom_item.quantity * ProductionOrder.quantity
         
         # 2. Fetch current cost
         item = get_item(db, bom_item.component_item_id)
@@ -58,12 +62,12 @@ def issue_materials_for_production(db, production_order):
         total_cost = qty_to_issue * cost_per_unit
         
         # 3. Reduce inventory
-        update_inventory_quantity(db, item.id, -qty_to_issue)
+        update_inventory_quantity(db, item.item_id, -qty_to_issue)
         
         # 4. Log to WIP
         wip_entry = WorkInProgress(
-            production_order_id=production_order.id,
-            item_id=item.item.id,
+            production_order_id=ProductionOrder.id,
+            item_id=Item.item_id,
             quantity_issued=qty_to_issue,
             cost_per_unit=cost_per_unit,
             total_cost=total_cost
@@ -74,12 +78,12 @@ def issue_materials_for_production(db, production_order):
 
 
 def complete_production_order(db: Session, order_id: int, completed_quantity: float):
-    order = db.query(production_order.ProductionOrder).filter_by(id=order_id).first()
+    order = db.query(ProductionOrder).filter_by(id=order_id).first()
     if not order or not order.wip:
         raise Exception("Production order or WIP not found.")
 
-    order.wip.completed_quantity = completed_quantity
-    order.status = production_order.ProductionStatus.completed
+    order.quantity = completed_quantity
+    order.status = ProductionStatus.completed
     order.end_date = datetime.utcnow()
 
     # 1. Calculate total WIP cost for this order
@@ -101,7 +105,7 @@ def complete_production_order(db: Session, order_id: int, completed_quantity: fl
     ))
 
     # 4. Log inventory change (your custom log)
-    db.add(stock_transaction.InventoryLog(
+    db.add(InventoryLog(
         item_id=order.item_id,
         warehouse_id=1,
         transaction_id=0,
@@ -111,7 +115,7 @@ def complete_production_order(db: Session, order_id: int, completed_quantity: fl
     ))
 
     # 5. Update item quantity and average cost
-    item_record = db.query(item.Item).filter_by(id=order.item_id).first()
+    item_record = db.query(Item).filter_by(id=order.item_id).first()
     current_qty = item_record.quantity or 0
     current_cost = item_record.average_cost or 0.0
     item_record.quantity += completed_quantity
