@@ -1,8 +1,8 @@
 ## inventory_bom_app/backend/main.py
+from utils.logger import setup_logging
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
-
 from backend.database import engine, Base
 from backend.routers import item
 from backend.routers import warehouse
@@ -13,7 +13,7 @@ from backend.routers import wip
 from backend.routers import uom
 from backend.routers import purchase
 
-
+setup_logging()
 
 Base.metadata.create_all(bind=engine)
 
