@@ -52,6 +52,8 @@ def start_production_order(db: Session, order_id: int):
 def issue_materials_for_production(db: Session, production_order: ProductionOrder):
     bom_items = get_bom_for_item(db, production_order.item_id)
 
+    print (production_order.item_id)
+
     for bom_item in bom_items:
         qty_to_issue = bom_item.quantity * production_order.quantity
         item_record = get_item(db, bom_item.component_item_id)

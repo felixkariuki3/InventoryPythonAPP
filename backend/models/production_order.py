@@ -25,15 +25,15 @@ class ProductionOrder(Base):
 
     item = relationship("Item")
     operations = relationship("ProductionOperation", back_populates="order", cascade="all, delete")
-    wip = relationship("WorkInProgress", back_populates="production_order", uselist=False)
+    wip = relationship("WorkInProgress", back_populates="production_order")
 
 
 class ProductionOperation(Base):
     __tablename__ = "production_operations"
 
     id = Column(Integer, primary_key=True, index=True)
-    order_id = Column(Integer, ForeignKey("production_orders.id"))
-    name = Column(String)
+    order_id = Column(Integer, ForeignKey("production_orders.id"), nullable=False)
+    name = Column(String, nullable= False)
     sequence = Column(Integer)
     duration_minutes = Column(Float)
 
