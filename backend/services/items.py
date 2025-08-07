@@ -5,4 +5,4 @@ def get_item(db, item_id: int):
     """
     Retrieves an item by its ID.
     """
-    return db.query(Item).filter(Item.id == item_id).first()
+    return db.query(Item).filter(Item.item_id == item_id).first()

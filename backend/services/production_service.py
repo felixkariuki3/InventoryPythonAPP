@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from backend.models.production_order import ProductionOrder, ProductionStatus
 from backend.models.item import Item
@@ -49,10 +50,14 @@ def start_production_order(db: Session, order_id: int):
     logger.info("Started production order ID %s", order_id)
 
 
-def issue_materials_for_production(db: Session, production_order: ProductionOrder):
+def issue_materials_for_production(db: Session, production_order: int):
+
+    production_order = db.query(ProductionOrder).filter(ProductionOrder.id == production_order).first()
+    if not production_order:
+        raise HTTPException(status_code=404, detail="Production order not found")
+
     bom_items = get_bom_for_item(db, production_order.item_id)
 
-    print (production_order.item_id)
 
     for bom_item in bom_items:
         qty_to_issue = bom_item.quantity * production_order.quantity
@@ -65,7 +70,7 @@ def issue_materials_for_production(db: Session, production_order: ProductionOrde
         cost_per_unit = item_record.average_cost or 0.0
         total_cost = qty_to_issue * cost_per_unit
 
-        update_inventory_quantity(db, item_record.id, -qty_to_issue)
+        update_inventory_quantity(db, item_record.item_id, -qty_to_issue)
 
         wip_entry = WorkInProgress(
             production_order_id=production_order.id,
