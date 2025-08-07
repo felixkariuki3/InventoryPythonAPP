@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from backend.models.production_order import ProductionOrder, ProductionOperation, ProductionStatus
+from backend.models.production_order import ProductionOrder, ProductionStatus
 from backend.models.item import Item
 from backend.models.stock_transaction import InventoryLog, Transaction
 from backend.models.bom import BOM
