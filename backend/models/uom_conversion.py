@@ -6,9 +6,9 @@ class UOMConversion(Base):
     __tablename__ = "uom_conversions"
 
     id = Column(Integer, primary_key=True, index=True)
-    item_id = Column(Integer, ForeignKey("items.id"))
-    base_uom_id = Column(Integer, ForeignKey("uoms.id"))
-    target_uom = Column(Integer, ForeignKey("uoms.id"))
+    item_id = Column(Integer, ForeignKey("items.item_id",name="fk_uom_conversions_item_id"))
+    base_uom_id = Column(Integer, ForeignKey("uoms.id",name="fk_uom_conversions_base_uom_id"))
+    target_uom = Column(Integer, ForeignKey("uoms.id",name="fk_uom_conversions_target_uom_id"))
     factor = Column(Float, nullable=False)
 
     item = relationship("Item", back_populates="conversions")

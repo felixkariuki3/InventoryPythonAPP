@@ -40,8 +40,8 @@ def downgrade() -> None:
     sa.Column('parent_item_id', sa.INTEGER(), nullable=True),
     sa.Column('component_item_id', sa.INTEGER(), nullable=True),
     sa.Column('quantity', sa.INTEGER(), nullable=True),
-    sa.ForeignKeyConstraint(['component_item_id'], ['items.id'], ),
-    sa.ForeignKeyConstraint(['parent_item_id'], ['items.id'], ),
+    sa.ForeignKeyConstraint(['component_item_id'], ['items.item_id'], ),
+    sa.ForeignKeyConstraint(['parent_item_id'], ['items.item_id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('boms', schema=None) as batch_op:

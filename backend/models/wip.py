@@ -9,8 +9,8 @@ class WorkInProgress(Base):
     __tablename__ = "work_in_progress"
 
     id = Column(Integer, primary_key=True, index=True)
-    production_order_id = Column(Integer, ForeignKey("production_orders.id"))
-    item_id = Column(Integer, ForeignKey("items.id"), nullable=False)
+    production_order_id = Column(Integer, ForeignKey("production_orders.id",name="fk_work_in_progress_production_order_id"))
+    item_id = Column(Integer, ForeignKey("items.item_id",name="fk_work_in_progress_item_id"), nullable=False)
     issued_quantity = Column(Float, default=0.0)
     cost_per_unit = Column(Float, nullable=False)
     total_cost = Column(Float, nullable=False)

@@ -17,7 +17,7 @@ class ProductionOrder(Base):
     __tablename__ = "production_orders"
 
     id = Column(Integer, primary_key=True, index=True)
-    item_id = Column(Integer, ForeignKey("items.id"), nullable=False)
+    item_id = Column(Integer, ForeignKey("items.item_id",name="fk_productions_orders_item_id"), nullable=False)
     quantity = Column(Float)
     status = Column(Enum(ProductionStatus), default=ProductionStatus.planned)
     start_date = Column(DateTime, default=datetime.datetime.utcnow)
@@ -32,7 +32,7 @@ class ProductionOperation(Base):
     __tablename__ = "production_operations"
 
     id = Column(Integer, primary_key=True, index=True)
-    order_id = Column(Integer, ForeignKey("production_orders.id"), nullable=False)
+    order_id = Column(Integer, ForeignKey("production_orders.id",name="fk_productions_operations_order_id"), nullable=False)
     name = Column(String, nullable= False)
     sequence = Column(Integer)
     duration_minutes = Column(Float)

@@ -19,10 +19,10 @@ class PurchaseOrderLine(Base):
     __tablename__ = "purchase_order_lines"
 
     id = Column(Integer, primary_key=True, index=True)
-    order_id = Column(Integer, ForeignKey("purchase_orders.id"))
-    item_id = Column(Integer, ForeignKey("items.id"))
+    order_id = Column(Integer, ForeignKey("purchase_orders.id",name="fk_purchase_order_lines_order_id"))
+    item_id = Column(Integer, ForeignKey("items.item_id",name="fk_purchase_order_lines_item_id"))
     quantity = Column(Float, nullable=False)
     unit_cost = Column(Float, nullable=False)
-    warehouse_id = Column(Integer, ForeignKey("warehouses.id"))
+    warehouse_id = Column(Integer, ForeignKey("warehouses.id",name="fk_purchase_order_lines_warehouses_id"))
 
     order = relationship("PurchaseOrder", back_populates="lines")

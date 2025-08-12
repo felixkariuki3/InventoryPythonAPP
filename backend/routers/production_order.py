@@ -29,7 +29,7 @@ def start_order(data: ProductionStartRequest, db: Session = Depends(get_db)):
 
 @router.post("/issue")
 def issue_materials(data: ProductionOrderIssue, db: Session = Depends(get_db)):
-    production_service.issue_materials_for_production(db, data.order_id )
+    production_service.issue_materials_for_production(db, data.order_id)
     return {"message": "Materials for {data.item_id}Issued"}
 
 @router.post("/complete")

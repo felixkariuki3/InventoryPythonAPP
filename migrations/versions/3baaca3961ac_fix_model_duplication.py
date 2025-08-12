@@ -50,7 +50,7 @@ def downgrade() -> None:
     sa.Column('quantity', sa.FLOAT(), nullable=False),
     sa.Column('unit_cost', sa.FLOAT(), nullable=False),
     sa.Column('warehouse_id', sa.INTEGER(), nullable=True),
-    sa.ForeignKeyConstraint(['item_id'], ['items.id'], ),
+    sa.ForeignKeyConstraint(['item_id'], ['items.item_id'], ),
     sa.ForeignKeyConstraint(['order_id'], ['purchase_orders.id'], ),
     sa.ForeignKeyConstraint(['warehouse_id'], ['warehouses.id'], ),
     sa.PrimaryKeyConstraint('id')

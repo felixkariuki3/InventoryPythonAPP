@@ -6,8 +6,8 @@ class BOM(Base):
     __tablename__ = "boms"
 
     id = Column(Integer, primary_key=True, index=True)
-    parent_item_id = Column(Integer, ForeignKey("items.id"))
-    component_item_id = Column(Integer, ForeignKey("items.id"))
+    parent_item_id = Column(Integer, ForeignKey("items.item_id", name="fk_items_item_id"))
+    component_item_id = Column(Integer, ForeignKey("items.item_id", name="fk_Bomcomponent_item_id"))
     quantity = Column(Integer)
 
     parent_item = relationship("Item", foreign_keys=[parent_item_id], backref="bom_parents")
