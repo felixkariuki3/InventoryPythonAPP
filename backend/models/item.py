@@ -20,3 +20,5 @@ class Item(Base):
     warehouse = relationship("Warehouse", back_populates="items")
     
     conversions = relationship("UOMConversion", back_populates="item")
+
+    wips = relationship("WorkInProgress", back_populates="item")

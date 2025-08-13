@@ -18,5 +18,5 @@ class WorkInProgress(Base):
     status = Column(String, default="in_progress")  # in_progress, completed, scrapped, paused
     updated_at = Column(DateTime, default=datetime.utcnow)
 
-    item = relationship("Item")
+    item = relationship("Item", back_populates="wips")
     production_order = relationship("ProductionOrder", back_populates="wip")
