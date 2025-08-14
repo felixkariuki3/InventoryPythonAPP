@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from backend.models.purchase import PurchaseOrder, PurchaseOrderLine
-from backend.schemas.purchase import PurchaseOrderCreate, PurchaseOrderLineCreate
+from backend.schemas.purchase import PurchaseOrderCreate, PurchaseOrderLineCreate, PurchaseOrderOut
 from backend.models.stock_transaction import InventoryLog
 
 
@@ -38,12 +38,12 @@ def add_purchase_item(db: Session, order_id: int, item: PurchaseOrderLineCreate)
         purchase_order_id=order_id,
         item_id=item.item_id,
         quantity=item.quantity,
-        unit_price=item.unit_price
+        unit_price=item.unit_cost
     )
     db.add(db_item)
     InventoryLog(
         db=db,
-        item_id=item.id,
+        item_id=item.item_id,
         warehouse_id=item.warehouse_id,  # Replace with actual warehouse if tracked
         quantity=PurchaseOrderLine.quantity,
         note=f"PO #{order_id} created"
@@ -53,4 +53,4 @@ def add_purchase_item(db: Session, order_id: int, item: PurchaseOrderLineCreate)
     return db_item
 
 def list_order_items(db: Session, order_id: int):
-    return db.query(PurchaseOrderLineCreate).filter(PurchaseOrderLineCreate.purchase_order_id == order_id).all()
+    return db.query(PurchaseOrderLineCreate).filter(PurchaseOrderOut.id == order_id).all()

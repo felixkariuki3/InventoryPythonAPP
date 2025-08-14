@@ -3,7 +3,6 @@ from backend.models.stock_transaction import Transaction, InventoryLog
 from backend.schemas.stock_transaction import TransactionCreate
 from fastapi import HTTPException
 from backend.schemas.stock_transaction import TransferTransaction
-from backend.schemas.stock_transaction import TransactionCreate
 from backend.schemas import stock_transaction as transaction_schema
 from sqlalchemy import func
 from backend.models.inventory import InventoryTransaction

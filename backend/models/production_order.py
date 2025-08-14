@@ -26,6 +26,7 @@ class ProductionOrder(Base):
     item = relationship("Item")
     operations = relationship("ProductionOperation", back_populates="order", cascade="all, delete")
     wip = relationship("WorkInProgress", back_populates="production_order")
+    
 
 
 class ProductionOperation(Base):

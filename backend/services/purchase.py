@@ -22,7 +22,7 @@ def receive_purchase_order(db: Session, order_id: int):
         raise HTTPException(status_code=400, detail="Purchase order already received")
 
     for line in PurchaseOrder.lines:
-        item = db.query(Item).filter(Item.id == PurchaseOrderLine.item_id).first()
+        item = db.query(Item).filter(Item.item_id == PurchaseOrderLine.item_id).first()
 
         if not item:
             continue  # Or raise an error depending on your design
@@ -39,7 +39,7 @@ def receive_purchase_order(db: Session, order_id: int):
 
         InventoryLog(
         db=db,
-        item_id=item.id,
+        item_id=item.item_id,
         warehouse_id=item.warehouse_id,  # Replace with actual warehouse if tracked
         quantity=PurchaseOrderLine.quantity,
         note=f"PO #{order.id} received"

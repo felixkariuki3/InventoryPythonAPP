@@ -13,4 +13,4 @@ def get_items(db: Session, skip: int = 0, limit: int = 10):
     return db.query(item_model.Item).offset(skip).limit(limit).all()
 
 def get_item(db: Session, item_id: int):
-    return db.query(item_model.Item).filter(item_model.Item.id == item_id).first()
+    return db.query(item_model.Item).filter(item_model.Item.item_id == item_id).first()

@@ -22,3 +22,4 @@ class Item(Base):
     conversions = relationship("UOMConversion", back_populates="item")
 
     wips = relationship("WorkInProgress", back_populates="item")
+   

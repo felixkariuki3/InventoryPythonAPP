@@ -30,7 +30,7 @@ def create_transaction(txn: TransactionCreate, db: Session = Depends(get_db)):
         update_item_average_cost(
             db,
             item_id=db_txn.item_id,
-            received_cost=db_txn.cost,
+            received_cost=db_txn.unit_cost,
             received_qty=db_txn.quantity,
             )
     return db_txn

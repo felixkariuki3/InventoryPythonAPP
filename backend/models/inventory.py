@@ -13,6 +13,7 @@ class InventoryTransaction(Base):
     quantity = Column(Float)
     transaction_type = Column(String)  # e.g. receipt, issue, transfer
     reference = Column(String)
+    unit_cost = Column(Float)
 
     item = relationship("Item")
     warehouse = relationship("Warehouse")

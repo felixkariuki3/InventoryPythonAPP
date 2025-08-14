@@ -13,7 +13,7 @@ def update_inventory_quantity(db, item_id: int, quantity_change: float):
          # Log inventory transaction
         if type:
             log = InventoryTransaction(
-                item_id=Item.id,
+                item_id=Item.item_id,
                 quantity=quantity_change,
                 transaction_type=type,
                 reference="WIP Completed"
