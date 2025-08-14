@@ -11,6 +11,7 @@ class Transaction(Base):
     warehouse_id = Column(Integer, ForeignKey("warehouses.id"))
     type = Column(String)  # 'receipt', 'issue', 'transfer', 'adjustment'
     quantity = Column(Float)
+    unit_cost = Column(Float)
     reference = Column(String, nullable=True)
     timestamp = Column(DateTime, default=datetime.utcnow)
 
