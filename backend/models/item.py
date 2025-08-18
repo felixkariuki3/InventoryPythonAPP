@@ -6,9 +6,9 @@ from backend.database import Base
 class Item(Base):
     __tablename__ = "items"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, index=True)
     name = Column(String, unique=True, index=True)
-    item_id =  Column(String, unique=True, index=True)
+    item_id =  Column(String,primary_key=True, unique=True, index=True)
     description = Column(String)
     quantity = Column(Integer)
     average_cost = Column(Float, default=0.0)
