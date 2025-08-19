@@ -38,7 +38,8 @@ def add_purchase_item(db: Session, order_id: int, item: PurchaseOrderLineCreate)
         purchase_order_id=order_id,
         item_id=item.item_id,
         quantity=item.quantity,
-        unit_price=item.unit_cost
+        unit_price=item.unit_cost,
+        warehouse_id = item.warehouse_id
     )
     db.add(db_item)
     InventoryLog(

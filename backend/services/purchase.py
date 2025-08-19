@@ -59,7 +59,7 @@ def receive_purchase_order(db: Session, order_id: int):
         raise HTTPException(status_code=400, detail="Purchase order already received")
 
     for line in order.lines:
-        item = db.query(Item).filter(Item.item_id == line.item_id).first()
+        item = db.query(Item).filter(Item.item_id ==line.item_id).first()
 
         if not item:
             continue  # Or raise HTTPException if strict

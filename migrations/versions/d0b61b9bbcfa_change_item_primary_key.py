@@ -6,7 +6,6 @@ Create Date: 2025-08-18 11:00:35.080719
 
 """
 from typing import Sequence, Union
-
 from alembic import op
 import sqlalchemy as sa
 
@@ -19,27 +18,24 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade():
-    # Drop old FK (assuming it was named fk_purchase_order_lines_item_id before)
-    op.drop_constraint('fk_purchase_order_lines_item_id', 'purchase_order_lines', type_='foreignkey')
-    
-    # Create new FK to items.item_id
-    op.create_foreign_key(
-        'fk_purchase_order_lines_item_id',    # new constraint name
-        'purchase_order_lines',              # source table
-        'items',                             # target table
-        ['item_id'],                         # local column
-        ['item_id']                          # remote column
-    )
+    # SQLite requires batch mode for altering constraints
+
+    with op.batch_alter_table("purchase_order_lines") as batch_op:
+        batch_op.drop_constraint("fk_purchase_order_lines_item_id", type_="foreignkey")
+        batch_op.create_foreign_key(
+            "fk_purchase_order_lines_item_id",
+            "items",
+            ["item_id"],
+            ["item_id"],
+        )
+
 
 def downgrade():
-    # Drop new FK
-    op.drop_constraint('fk_purchase_order_lines_item_id', 'purchase_order_lines', type_='foreignkey')
-    
-    # Restore old FK (if it was pointing to items.id before)
-    op.create_foreign_key(
-        'fk_purchase_order_lines_item_id',
-        'purchase_order_lines',
-        'items',
-        ['item_id'],
-        ['id']   # <-- restore old reference if you ever downgrade
-    )
+    with op.batch_alter_table("purchase_order_lines") as batch_op:
+        batch_op.drop_constraint("fk_purchase_order_lines_item_id", type_="foreignkey")
+        batch_op.create_foreign_key(
+            "fk_purchase_order_lines_item_id",
+            "items",
+            ["item_id"],
+            ["id"],  # restoring old FK if downgrading
+        )

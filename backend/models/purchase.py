@@ -26,3 +26,4 @@ class PurchaseOrderLine(Base):
     warehouse_id = Column(Integer, ForeignKey("warehouses.id",name="fk_purchase_order_lines_warehouses_id"))
 
     order = relationship("PurchaseOrder", back_populates="lines")
+    
