@@ -19,7 +19,8 @@ def create_purchase_order(db: Session, order_data: PurchaseOrderCreate):
             order_id=db_order.id,
             item_id=line.item_id,
             quantity=line.quantity,
-            unit_cost=line.unit_cost
+            unit_cost=line.unit_cost,
+            warehouse_id=line.warehouse_id 
         )
         db.add(db_line)
 

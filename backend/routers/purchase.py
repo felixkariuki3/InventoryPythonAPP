@@ -38,5 +38,5 @@ def get_order(order_id: int, db: Session = Depends(get_db)):
     return order
 #Receiving orders and marking them as received
 @router.post("/{order_id}/receive")
-def receive_order(order_id: int, db: Session = Depends(get_db)):
-    return receive_purchase_order(db, order_id)
+def receive_order(order_id: int, receipt_req: schemas.ReceiptRequest, db: Session = Depends(get_db)):
+    return receive_purchase_order(db, order_id, receipt_req.receipts)

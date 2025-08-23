@@ -1,7 +1,10 @@
 # backend/services/purchasing.py
 from sqlalchemy.orm import Session
+from sqlalchemy.orm import selectinload
+from sqlalchemy import inspect
+from sqlalchemy.orm.state import InstanceState
 from fastapi import HTTPException
-from backend.models.purchase import PurchaseOrder, PurchaseOrderLine
+from backend.models.purchase import PurchaseOrder, PurchaseOrderLine,PurchaseOrderStatus
 from backend.models.item import Item
 from backend.models.stock_transaction import InventoryLog
 from utils.costing import calculate_weighted_average
@@ -32,52 +35,39 @@ def log_inventory_movement(db: Session, item_id: int, warehouse_id: int, qty: fl
     log = InventoryLog(
         item_id=item_id,
         warehouse_id=warehouse_id,
-        quantity=qty,
-        note=note
+        change=qty,
+        note=note,
     )
     db.add(log)
     return log
 
+from fastapi import HTTPException
+from backend.models.purchase import PurchaseOrder, PurchaseOrderStatus
 
-def receive_purchase_order(db: Session, order_id: int):
-    """
-    Receives a purchase order, updates stock levels, 
-    recalculates weighted average costs, and logs inventory movements.
-    """
+def receive_purchase_order(db, order_id: int, receipts: list[dict]):
     order = db.query(PurchaseOrder).filter(PurchaseOrder.id == order_id).first()
-
     if not order:
         raise HTTPException(status_code=404, detail="Purchase order not found")
 
-    if order.status != "open":
-        raise HTTPException(status_code=400, detail=f"Order already in {order.status}")
+    fully_received = True  # assume complete until proven otherwise
 
-    if not order.lines or len(order.lines) == 0:
-        raise HTTPException(status_code=400, detail="Order has no lines")
+    for receipt in receipts:
+        line = next((l for l in order.lines if l.id == receipt["line_id"]), None)
+        if not line:
+            raise HTTPException(status_code=404, detail=f"Line {receipt['line_id']} not found")
 
-    if order.status == "received":
-        raise HTTPException(status_code=400, detail="Purchase order already received")
+        line.received_qty += receipt["received_qty"]
 
-    for line in order.lines:
-        item = db.query(Item).filter(Item.item_id ==line.item_id).first()
+        # check if this line is fully received
+        if line.received_qty < line.ordered_qty:
+            fully_received = False
 
-        if not item:
-            continue  # Or raise HTTPException if strict
+    # update order status
+    if fully_received:
+        order.status = PurchaseOrderStatus.RECEIVED
+    else:
+        order.status = PurchaseOrderStatus.PARTIALLY_RECEIVED
 
-        # 1. Update stock
-        update_item_stock(db, item, line.quantity, line.unit_cost)
-
-        # 2. Log movement
-        log_inventory_movement(
-            db=db,
-            item_id=item.item_id,
-            warehouse_id=item.warehouse_id,  # if tracked
-            qty=line.quantity,
-            note=f"PO #{order.id} received"
-        )
-
-    order.status = "received"
-    db.add(order)
     db.commit()
     db.refresh(order)
     return order

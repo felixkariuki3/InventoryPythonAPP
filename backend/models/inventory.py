@@ -1,6 +1,6 @@
 ## inventory_bom_app/backend/item.py
 from datetime import datetime
-from sqlalchemy import Column, DateTime, Integer, String, Float, ForeignKey
+from sqlalchemy import NUMERIC, Column, DateTime, Integer, String, Float, ForeignKey
 from sqlalchemy.orm import relationship
 from backend.database import Base
 
@@ -13,7 +13,7 @@ class InventoryTransaction(Base):
     quantity = Column(Float)
     transaction_type = Column(String)  # e.g. receipt, issue, transfer
     reference = Column(String)
-    unit_cost = Column(Float)
+    unit_cost = Column(NUMERIC(12,2))
 
     item = relationship("Item")
     warehouse = relationship("Warehouse")

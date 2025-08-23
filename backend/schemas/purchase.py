@@ -27,3 +27,10 @@ class PurchaseOrderOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+class ReceiptLine(BaseModel):
+    line_id: int
+    received_qty: int
+
+class ReceiptRequest(BaseModel):
+    receipts: List[ReceiptLine]
