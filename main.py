@@ -12,6 +12,7 @@ from backend.routers import production_order
 from backend.routers import wip
 from backend.routers import uom
 from backend.routers import purchase
+from backend.routers import sales_order
 
 setup_logging()
 
@@ -36,6 +37,7 @@ app.include_router(production_order.router)
 app.include_router(wip.router)
 app.include_router(uom.router)
 app.include_router(purchase.router)
+app.include_router(sales_order.router)
 
 
 @app.get("/")

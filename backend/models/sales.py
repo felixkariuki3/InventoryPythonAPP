@@ -45,7 +45,7 @@ class SalesOrder(Base):
     customer_id = Column(Integer, ForeignKey("customers.id", name="fk_sales_orders_customer_id"), nullable=False, index=True)
     order_date = Column(DateTime, default=datetime.utcnow)
     status = Column(String, default="DRAFT", index=True)
-    notes = Column(Text)
+    remarks = Column(Text)
 
     customer = relationship("Customer", back_populates="sales_orders")
     lines = relationship("SalesOrderLine", back_populates="order", cascade="all, delete-orphan")
@@ -67,6 +67,7 @@ class SalesOrderLine(Base):
     order = relationship("SalesOrder", back_populates="lines")
     item = relationship("Item", back_populates="sales_order_lines", uselist=False)
     warehouse = relationship("Warehouse")
+    reservations = relationship("StockReservation", back_populates="order_line", cascade="all, delete-orphan")
 
 
 # ---------------------------
@@ -241,6 +242,7 @@ class StockReservation(Base):
     order_line = relationship("SalesOrderLine", back_populates="reservations")
     item = relationship("Item")
     warehouse = relationship("Warehouse")
+    order_line = relationship("SalesOrderLine", back_populates="reservations")
 
 class AccountingEvent(Base):
     __tablename__ = "accounting_events"
