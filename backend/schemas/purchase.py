@@ -29,8 +29,12 @@ class PurchaseOrderOut(BaseModel):
         from_attributes = True
 
 class ReceiptLine(BaseModel):
-    line_id: int
+    id: int
     received_qty: int
+
+    class Config:
+        orm_mode = True
+    
 
 class ReceiptRequest(BaseModel):
     receipts: List[ReceiptLine]

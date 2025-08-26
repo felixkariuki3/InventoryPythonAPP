@@ -34,7 +34,9 @@ def run_migrations_offline():
         literal_binds=True,
         compare_type=True,   # Detect column type changes
         compare_server_default=True , # Detect server defaults
-        render_as_batch=True  
+        render_as_batch=True,  
+        include_object=lambda obj, name, type_, reflected, compare_to:
+        True  # or add logic to ignore certain differences
     )
 
     with context.begin_transaction():
@@ -54,7 +56,9 @@ def run_migrations_online():
             target_metadata=target_metadata,
             compare_type=True,
             compare_server_default=True,
-            render_as_batch=True  
+            render_as_batch=True ,
+            include_object=lambda obj, name, type_, reflected, compare_to:
+            True  # or add logic to ignore certain differences
         )
 
         with context.begin_transaction():

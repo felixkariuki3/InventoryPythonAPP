@@ -30,7 +30,7 @@ class PurchaseOrderLine(Base):
     order_id = Column(Integer, ForeignKey("purchase_orders.id",name="fk_purchase_order_lines_order_id"))
     item_id = Column(Integer, ForeignKey("items.item_id",name="fk_purchase_order_lines_item_id"))
     quantity = Column(Float, nullable=False)
-    received_qty = Column(Float, default=0)
+    received_qty = Column(Float, default=0, nullable = False)
     unit_cost = Column(Float, nullable=False)
     warehouse_id = Column(Integer, ForeignKey("warehouses.id",name="fk_purchase_order_lines_warehouses_id"))
    
