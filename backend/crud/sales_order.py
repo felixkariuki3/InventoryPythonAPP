@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from backend.models.sales import SalesOrder, SalesOrderLine
 from backend.schemas.sales import (
-    SalesOrderCreate, SalesOrderUpdate,
+    SalesOrderCreate, SalesOrderLineBase,SalesOrderRead,SalesOrderUpdate,
     SalesOrderLineCreate
 )
 

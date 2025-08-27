@@ -4,14 +4,14 @@ from backend.models.sales import SalesOrder, SalesOrderLine, SalesOrderStatus
 from backend.models.inventory import InventoryTransaction
 from backend.models.sales import StockReservation
 from backend.schemas.sales import SalesOrderCreate, SalesOrderUpdate
-from backend.crud.sales_order import sales_orders
+from backend.crud.sales_order import create_sales_order,get_sales_order,update_sales_order
 
 
 class SalesOrderService:
 
     @staticmethod
     def create_order(db: Session, order_in: SalesOrderCreate):
-        order = sales_orders.create(db, obj_in=order_in)
+        order = create_sales_order(db, obj_in=order_in)
 
         # Reserve stock for each line
         for line in order.lines:
@@ -29,12 +29,12 @@ class SalesOrderService:
 
     @staticmethod
     def update_order(db: Session, order_id: int, order_in: SalesOrderUpdate):
-        order = sales_orders.update(db, db_obj=sales_orders.get(db, order_id), obj_in=order_in)
+        order = update_sales_order(db, db_obj=get_sales_order(db, order_id), obj_in=order_in)
         return order
 
     @staticmethod
     def confirm_order(db: Session, order_id: int):
-        order = sales_orders.get(db, order_id)
+        order = get_sales_order(db, order_id)
         if not order:
             raise ValueError("Order not found")
         order.status = SalesOrderStatus.CONFIRMED
@@ -44,7 +44,7 @@ class SalesOrderService:
 
     @staticmethod
     def fulfill_order(db: Session, order_id: int):
-        order = sales_orders.get(db, order_id)
+        order = get_sales_order(db, order_id)
         if not order or order.status != SalesOrderStatus.CONFIRMED:
             raise ValueError("Order cannot be fulfilled")
 

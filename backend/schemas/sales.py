@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime,date
 from decimal import Decimal
 
 
@@ -33,6 +33,13 @@ class SalesOrderCreate(BaseModel):
     remarks: Optional[str] = None
     lines: List[SalesOrderLineCreate]
 
+class SalesOrderUpdate(BaseModel):
+    customer_id: Optional[int] = None
+    order_date: Optional[date] = None
+    due_date: Optional[date] = None
+    status: Optional[str] = None
+    # optionally allow line updates
+    lines: Optional[List[SalesOrderLineCreate]] = None
 
 class SalesOrderRead(BaseModel):
     id: int

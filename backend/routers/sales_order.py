@@ -6,8 +6,9 @@ from backend.schemas.sales import (
     SalesOrderCreate, SalesOrderRead, SalesOrderUpdate,
     SalesOrderLineCreate, SalesOrderLineRead
 )
-from backend.services import sales_orders as sales_orders_service
-from backend.database import get_db
+from backend.services.sales import sales_order as sales_orders_service
+from backend.services.sales import reservations as reservation_service
+from backend.dependencies import get_db
 
 router = APIRouter(
     prefix="/sales/orders",
@@ -47,7 +48,7 @@ def delete_sales_order(order_id: int, db: Session = Depends(get_db)):
 
 @router.post("/{order_id}/reserve", response_model=SalesOrderRead)
 def reserve_stock(order_id: int, db: Session = Depends(get_db)):
-    return sales_orders_service.reserve_stock_for_order(db, order_id)
+    return reservation_service.ReservationCreate(db, order_id)
 
 @router.post("/{order_id}/fulfill", response_model=SalesOrderRead)
 def fulfill_order(order_id: int, db: Session = Depends(get_db)):
