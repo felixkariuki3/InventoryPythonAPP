@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from backend.models.sales import SalesOrder, SalesPayment
-from backend.models.sales import JournalEntry, JournalLine
+from backend.models.sales import SalesOrder, Payment,PaymentAllocation,JournalEntry,JournalLine
+
 
 
 class SalesAccountingService:
@@ -37,7 +37,7 @@ class SalesAccountingService:
 
     @staticmethod
     def post_payment(db: Session, payment_id: int):
-        payment = db.query(SalesPayment).filter(SalesPayment.id == payment_id).first()
+        payment = db.query(Payment).filter(Payment.id == payment_id).first()
         if not payment:
             raise ValueError("Payment not found")
 

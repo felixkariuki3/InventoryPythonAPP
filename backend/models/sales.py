@@ -1,6 +1,6 @@
 # backend/models/sales.py
 from sqlalchemy import (
-    Column, Integer, String, Float, DateTime, ForeignKey, Text, func
+    Column, Integer, Numeric, String, Float, DateTime, ForeignKey, Text, func
 )
 from enum import Enum
 from sqlalchemy.orm import relationship
@@ -194,8 +194,8 @@ class SalesAdjustment(Base):
     reason = Column(Text)
     adj_date = Column(DateTime, default=datetime.utcnow)
 
-    invoice = relationship("SalesInvoice")
-    customer = relationship("Customer")
+    customer = relationship("Customer", back_populates="adjustments")
+    invoice = relationship("SalesInvoice", back_populates="adjustments")
 
 # ---------------------------
 # Payments & Allocations
@@ -258,4 +258,39 @@ class AccountingEvent(Base):
     status = Column(String, default="PENDING")  # to be picked by accounting processor
     created_at = Column(DateTime, default=datetime.utcnow)
 
+class JournalEntry(Base):
+    __tablename__ = "journal_entries"
+
+    id = Column(Integer, primary_key=True, index=True)
+    reference = Column(String, index=True)
+    description = Column(String, nullable=True)
+    entry_date = Column(DateTime, default=datetime.utcnow)
+
+    lines = relationship("JournalLine", back_populates="journal")
+
+
+class JournalLine(Base):
+    __tablename__ = "journal_lines"
+
+    id = Column(Integer, primary_key=True, index=True)
+    journal_id = Column(Integer, ForeignKey("journal_entries.id"))
+    account = Column(String, index=True)
+    debit = Column(Numeric(12, 2), default=0)
+    credit = Column(Numeric(12, 2), default=0)
+
+    journal = relationship("JournalEntry", back_populates="lines")
+# ---------------------------
+# Sales Returns
+# ---------------------------
+class SalesReturn(Base):
+    __tablename__ = "sales_returns"
+
+    id = Column(Integer, primary_key=True, index=True)
+    sales_order_id = Column(Integer, ForeignKey("sales_orders.id"))
+    sales_order_line_id = Column(Integer, ForeignKey("sales_order_lines.id"), nullable=True)
+    item_id = Column(Integer, ForeignKey("items.item_id"))
+    quantity = Column(Float, nullable=False)
+    reason = Column(String, nullable=True)
+    status = Column(String, default="pending")  # pending, approved, rejected, completed
+    created_at = Column(DateTime, default=datetime.utcnow)
 

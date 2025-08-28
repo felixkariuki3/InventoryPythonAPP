@@ -108,28 +108,50 @@ class SalesInvoiceRead(BaseModel):
 # ---------------------------
 # Payments + Allocations
 # ---------------------------
-class PaymentAllocationRead(BaseModel):
-    id: int
+class PaymentAllocationBase(BaseModel):
     invoice_id: int
     amount_applied: Decimal
+
+
+class PaymentAllocationCreate(PaymentAllocationBase):
+    pass
+
+
+class PaymentAllocationRead(PaymentAllocationBase):
+    id: int
 
     class Config:
         orm_mode = True
 
 
-class PaymentRead(BaseModel):
-    id: int
+class PaymentBase(BaseModel):
     customer_id: int
-    payment_date: datetime
+    payment_date: Optional[datetime] = None
     method: str
     reference: Optional[str]
     amount: Decimal
+    notes: Optional[str] = None
+
+
+class PaymentCreate(PaymentBase):
+    allocations: List[PaymentAllocationCreate] = []
+
+
+class PaymentUpdate(BaseModel):
+    payment_date: Optional[datetime]
+    method: Optional[str]
+    reference: Optional[str]
+    amount: Optional[Decimal]
+    notes: Optional[str]
+
+
+class PaymentRead(PaymentBase):
+    id: int
     unallocated_amount: Decimal
     allocations: List[PaymentAllocationRead] = []
 
     class Config:
         orm_mode = True
-
 
 # ---------------------------
 # Credit Notes
@@ -161,31 +183,52 @@ class CreditNoteRead(BaseModel):
 # ---------------------------
 # Adjustments
 # ---------------------------
-class SalesAdjustmentRead(BaseModel):
-    id: int
+class SalesAdjustmentBase(BaseModel):
     customer_id: int
-    invoice_id: Optional[int]
+    invoice_id: Optional[int] = None
     adj_type: str
     amount: Decimal
-    reason: Optional[str]
+    reason: Optional[str] = None
+
+
+class SalesAdjustmentCreate(SalesAdjustmentBase):
+    adj_date: Optional[datetime] = None  # defaults at service/DB level
+
+
+class SalesAdjustmentUpdate(BaseModel):
+    invoice_id: Optional[int] = None
+    adj_type: Optional[str] = None
+    amount: Optional[Decimal] = None
+    reason: Optional[str] = None
+    adj_date: Optional[datetime] = None
+
+
+class SalesAdjustmentRead(SalesAdjustmentBase):
+    id: int
     adj_date: datetime
 
     class Config:
         orm_mode = True
 
-
 # ---------------------------
 # Stock Reservations
 # ---------------------------
-class StockReservationRead(BaseModel):
-    id: int
-    sales_order_line_id: int
+class ReservationBase(BaseModel):
+    order_line_id: int
     item_id: int
-    warehouse_id: int
     reserved_qty: Decimal
-    released_qty: Decimal
+
+class ReservationCreate(ReservationBase):
+    pass
+
+class ReservationUpdate(BaseModel):
+    reserved_qty: Optional[Decimal] = None
+    status: Optional[str] = None
+
+class ReservationRead(ReservationBase):
+    id: int
+    reserved_date: datetime
     status: str
-    created_at: datetime
 
     class Config:
         orm_mode = True
@@ -204,6 +247,31 @@ class AccountingEventRead(BaseModel):
     credit_account: Optional[str]
     currency: str
     status: str
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
+# ---------------------------
+# Sales Returns
+# ---------------------------
+class SalesReturnCreate(BaseModel):
+    sales_order_id: int
+    sales_order_line_id: Optional[int]
+    item_id: int
+    quantity: float
+    reason: Optional[str] = None
+
+class SalesReturnUpdate(BaseModel):
+    status: Optional[str] = None
+    quantity: Optional[float] = None  # in case adjustment is needed
+
+class SalesReturnResponse(BaseModel):
+    id: int
+    sales_order_id: int
+    item_id: int
+    quantity: float
+    status: str
+    reason: Optional[str]
     created_at: datetime
 
     class Config:
