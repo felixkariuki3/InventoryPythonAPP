@@ -5,7 +5,7 @@ from backend.dependencies import get_db
 from backend.schemas.sales.adjustments import SalesAdjustmentCreate, SalesAdjustmentRead, SalesAdjustmentUpdate
 from backend.services.sales import adjustments
 
-router = APIRouter(prefix="/sales/adjustments",tags="Sales Adjustments")
+router = APIRouter(prefix="/sales/adjustments",tags=["Sales Adjustments"])
 
 @router.post("/", response_model=SalesAdjustmentRead)
 def create(adjustment: SalesAdjustmentCreate, db: Session = Depends(get_db)):

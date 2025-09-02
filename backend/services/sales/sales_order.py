@@ -2,8 +2,8 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 from backend.models.Sales.sales_order import SalesOrder, SalesOrderLine, SalesOrderStatus
 from backend.models.inventory import InventoryTransaction
-from backend.models.Sales.sales_order import StockReservation
-from backend.schemas.sales import SalesOrderCreate, SalesOrderUpdate
+from backend.models.Sales.reservations import StockReservation
+from backend.schemas.sales.sales_order import SalesOrderCreate, SalesOrderUpdate
 from backend.crud.sales_order import create_sales_order,get_sales_order,update_sales_order
 
 

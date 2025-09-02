@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from backend.models.Sales.sales_order import StockReservation
-from backend.schemas.sales import ReservationBase,ReservationCreate,ReservationRead,ReservationUpdate
+from backend.models.Sales.reservations import StockReservation
+from backend.schemas.sales.reservations import ReservationCreate,ReservationUpdate
 
 
 class ReservationService:

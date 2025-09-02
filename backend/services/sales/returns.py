@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from backend.models.Sales.sales_order import SalesReturn
-from backend.schemas.sales import SalesReturnCreate, SalesReturnUpdate
+from backend.models.Sales.returns import SalesReturn
+from backend.schemas.sales.returns import SalesReturnCreate, SalesReturnUpdate
 
 def create_return(db: Session, return_data: SalesReturnCreate):
     new_return = SalesReturn(**return_data.dict())

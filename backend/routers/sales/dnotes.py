@@ -5,7 +5,7 @@ from backend.dependencies import get_db
 from backend.schemas.sales.sales_order import SalesOrderRead
 from backend.services.sales import sales_order
 
-router = APIRouter(prefix="/sales/dnotes",tags="Delivery Notes")
+router = APIRouter(prefix="/sales/dnotes",tags=["Delivery Notes"])
 
 
 @router.post("/{order_id}/fulfill", response_model=SalesOrderRead)

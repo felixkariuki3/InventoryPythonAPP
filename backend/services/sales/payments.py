@@ -1,8 +1,9 @@
 from datetime import datetime
 from typing import Optional
 from sqlalchemy.orm import Session
-from backend.models.Sales.sales_order import SalesInvoice, SalesOrder, SalesOrderStatus,Payment,PaymentAllocation
-from backend.schemas.sales import PaymentCreate,PaymentAllocationBase,PaymentAllocationCreate,PaymentUpdate,PaymentAllocationRead,PaymentBase
+from backend.models.Sales.invoices import SalesInvoice
+from backend.models.Sales.payments import Payment,PaymentAllocation
+from backend.schemas.sales.payments import PaymentCreate,PaymentUpdate
 
 
 def create_payment(db: Session, payment_in: PaymentCreate):

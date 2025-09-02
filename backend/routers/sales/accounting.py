@@ -4,4 +4,4 @@ from sqlalchemy.orm import Session
 from backend.dependencies import get_db
 
 
-router= APIRouter(prefix="/sales/accounting",tags="Accounting")
+router= APIRouter(prefix="/sales/accounting",tags=["Accounting"])

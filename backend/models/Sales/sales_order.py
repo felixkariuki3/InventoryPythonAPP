@@ -1,4 +1,5 @@
 # backend/models/sales.py
+import enum
 from sqlalchemy import (
     Column, Integer, Numeric, String, Float, DateTime, ForeignKey, Text, func
 )
@@ -11,6 +12,14 @@ from backend.database import Base
 # ---------------------------
 # Sales Orders
 # ---------------------------
+
+class SalesOrderStatus(enum.Enum):
+    DRAFT = "draft"
+    CONFIRMED = "confirmed"
+    PARTIALLY_SHIPPED = "partially_shipped"
+    SHIPPED = "shipped"
+    CANCELLED = "cancelled"
+    
 class SalesOrder(Base):
     __tablename__ = "sales_orders"
 

@@ -5,7 +5,7 @@ from backend.dependencies import get_db
 from backend.schemas.sales.payments import PaymentCreate, PaymentRead, PaymentUpdate
 from backend.services.sales import payments
 
-router = APIRouter(prefix="/sales/payments",tags="payments")
+router = APIRouter(prefix="/sales/payments",tags=["payments"])
 
 @router.post("/", response_model=PaymentRead)
 def create_payment(payment_in: PaymentCreate, db: Session = Depends(get_db)):

@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from backend.models.Sales.sales_order import SalesAdjustment, SalesOrder
-from backend.schemas.sales import SalesAdjustmentCreate,SalesAdjustmentRead,SalesAdjustmentUpdate,SalesAdjustmentBase
+from backend.models.Sales.adjustments import SalesAdjustment
+from backend.schemas.sales.adjustments import SalesAdjustmentCreate,SalesAdjustmentRead,SalesAdjustmentUpdate,SalesAdjustmentBase
 
 
 
