@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from backend.models.sales import SalesOrder, Payment,PaymentAllocation,JournalEntry,JournalLine
+from backend.models.Sales.sales_order import SalesOrder, Payment,PaymentAllocation,JournalEntry,JournalLine
 
 
 

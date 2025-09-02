@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from backend.models.sales import SalesReturn
+from backend.models.Sales.sales_order import SalesReturn
 from backend.schemas.sales import SalesReturnCreate, SalesReturnUpdate
 
 def create_return(db: Session, return_data: SalesReturnCreate):

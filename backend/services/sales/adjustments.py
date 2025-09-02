@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from backend.models.sales import SalesAdjustment, SalesOrder
+from backend.models.Sales.sales_order import SalesAdjustment, SalesOrder
 from backend.schemas.sales import SalesAdjustmentCreate,SalesAdjustmentRead,SalesAdjustmentUpdate,SalesAdjustmentBase
 
 

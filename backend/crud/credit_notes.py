@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from backend.models.sales import CreditNote, CreditNoteLine
+from backend.models.Sales.credit_notes import CreditNote, CreditNoteLine
 from backend.schemas.sales import (
     CreditNoteCreate, CreditNoteUpdate, CreditNoteLineCreate
 )

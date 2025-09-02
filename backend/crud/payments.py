@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from backend.models.sales import Payment
+from backend.models.Sales.payments import Payment
 from backend.schemas.sales import PaymentCreate, PaymentUpdate
 
 # ---- Payment CRUD ----

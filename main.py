@@ -12,7 +12,8 @@ from backend.routers import production_order
 from backend.routers import wip
 from backend.routers import uom
 from backend.routers import purchase
-from backend.routers import sales_order
+from backend.routers.sales import sales_order,adjustments,accounting,credit_notes,customers,dnotes,invoices,payments,reservations,returns
+
 
 setup_logging()
 
@@ -38,6 +39,15 @@ app.include_router(wip.router)
 app.include_router(uom.router)
 app.include_router(purchase.router)
 app.include_router(sales_order.router)
+app.include_router(accounting.router)
+app.include_router(adjustments.router)
+app.include_router(credit_notes.router)
+app.include_router(customers.router)
+app.include_router(dnotes.router)
+app.include_router(invoices.router)
+app.include_router(payments.router)
+app.include_router(reservations.router)
+app.include_router(returns.router)
 
 
 @app.get("/")
