@@ -50,3 +50,5 @@ class SalesInvoiceRead(BaseModel):
 class SalesInvoiceUpdate(BaseModel):
     invoice_date: datetime
     status: str
+
+
