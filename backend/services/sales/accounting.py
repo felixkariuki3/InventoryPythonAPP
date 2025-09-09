@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from backend.models.Sales.sales_order import SalesOrder
-from backend.models.Sales.payments import Payment,PaymentAllocation
+from backend.models.Sales.payments import Payment
 from backend.models.Sales.accounting import JournalEntry,JournalLine
 
 
