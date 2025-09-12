@@ -1,21 +1,8 @@
-from sqlalchemy import (
-    Column, Integer, Numeric, String, Float, DateTime, ForeignKey, Text, func
-)
-from enum import Enum
+from sqlalchemy import Column, Integer, String, Float, DateTime
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from backend.database import Base
 
-# ---------------------------
-# Customers
-# ---------------------------
-class SalesOrderStatus(str, Enum):
-    DRAFT = "DRAFT"
-    CONFIRMED = "CONFIRMED"
-    PARTIALLY_SHIPPED = "PARTIALLY_SHIPPED"
-    SHIPPED = "SHIPPED"
-    CLOSED = "CLOSED"
-    CANCELLED = "CANCELLED"
 
 class Customer(Base):
     __tablename__ = "customers"

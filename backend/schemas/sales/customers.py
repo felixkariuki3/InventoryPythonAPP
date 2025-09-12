@@ -1,25 +1,37 @@
 from pydantic import BaseModel
-from typing import List, Optional
-from datetime import datetime,date
-from decimal import Decimal
+from typing import Optional
+from datetime import datetime
 
+
+# Shared properties
 class CustomerBase(BaseModel):
     name: str
-    email: str
-    phone:str
-    terms:str
-    credit_limit:Optional[float]
-    is_active:Optional[int]
+    email: Optional[str]
+    phone: Optional[str]
+    terms: Optional[str]
+    credit_limit: Optional[float] = 0
+    is_active: Optional[int] = 1
+
 
 class CustomerCreate(CustomerBase):
     pass
 
+
 class CustomerUpdate(CustomerBase):
     pass
 
-class CustomerOut(BaseModel):
-    id:int
-    name:str
 
-class Config:
+class CustomerRead(CustomerBase):
+    id: int
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class CustomerOut(BaseModel):
+    id: int
+    name: str
+
+    class Config:
         orm_mode = True
