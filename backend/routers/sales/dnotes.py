@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from typing import List
-from backend.database import get_db
+from backend.dependencies import get_db
 from backend.schemas.sales.dnotes import DeliveryNoteCreate, DeliveryNoteRead
 from backend.services.sales import dnotes as service
 
-router = APIRouter(prefix="/delivery-notes", tags=["Delivery Notes"])
+router = APIRouter(prefix="/sales/delivery-notes", tags=["Delivery Notes"])
 
 
 @router.post("/", response_model=DeliveryNoteRead)

@@ -28,6 +28,8 @@ class SalesOrder(Base):
     order_date = Column(DateTime, default=datetime.utcnow)
     status = Column(String, default="DRAFT", index=True)
     remarks = Column(Text)
+    due_date=Column(DateTime, default=datetime.utcnow)
+    total_amount=Column(Float, default=0)
 
     customer = relationship("Customer", back_populates="sales_orders")
     lines = relationship("SalesOrderLine", back_populates="order", cascade="all, delete-orphan")
@@ -44,6 +46,7 @@ class SalesOrderLine(Base):
     unit_price = Column(Float, nullable=False)
     tax_rate = Column(Float, default=0)
     discount_rate = Column(Float, default=0)
+    line_total= Column(Float, default=0)
     warehouse_id = Column(Integer, ForeignKey("warehouses.id", name="fk_sol_warehouse_id"))
 
     order = relationship("SalesOrder", back_populates="lines")

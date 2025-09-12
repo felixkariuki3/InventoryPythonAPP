@@ -24,6 +24,8 @@ class Item(Base):
     wips = relationship("WorkInProgress", back_populates="item")
     
     purchase_order_lines = relationship("PurchaseOrderLine", back_populates="item")
+
+    sales_order_lines = relationship("SalesOrderLine", back_populates="item")
     
   
    

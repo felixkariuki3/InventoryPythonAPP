@@ -5,7 +5,7 @@ from backend.dependencies import get_db
 from backend.schemas.sales.customers import CustomerCreate, CustomerUpdate, CustomerRead
 from backend.services.sales import Customers as service
 
-router = APIRouter(prefix="/customers", tags=["Customers"])
+router = APIRouter(prefix="/sales/customers", tags=["Customers"])
 
 
 @router.post("/", response_model=CustomerRead)

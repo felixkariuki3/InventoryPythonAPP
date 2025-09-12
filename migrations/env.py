@@ -12,7 +12,7 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 # Import Base from your models
 from backend.database import Base  # Adjust path to your project
 from backend.models import item, warehouse,bom,production_order,purchase,uom,uom_conversion,stock_transaction,inventory,wip # This ensures all models are imported
-from backend.models.Sales import reservations,returns,invoices,sales_order,credit_notes,customers,adjustments,accounting,dnotes
+from backend.models.Sales import reservations,returns,invoices,sales_order,credit_notes,customers,adjustments,accounting,dnotes,payments
 # Alembic Config object
 config = context.config
 

@@ -19,7 +19,7 @@ class CreditNote(Base):
     total = Column(Float, default=0, nullable=False)
     notes = Column(Text)
 
-    customer = relationship("Customer", backref="credit_notes")
+    customer = relationship("Customer", back_populates="credit_notes")
     reference_invoice = relationship("SalesInvoice", backref="credit_notes")
     lines = relationship(
         "CreditNoteLine",

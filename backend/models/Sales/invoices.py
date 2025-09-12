@@ -26,6 +26,7 @@ class SalesInvoice(Base):
     customer = relationship("Customer", back_populates="invoices")
     lines = relationship("SalesInvoiceLine", back_populates="invoice", cascade="all, delete-orphan")
     allocations = relationship("PaymentAllocation", back_populates="invoice", cascade="all, delete-orphan")
+    adjustments = relationship ("SalesAdjustment", back_populates="invoice")
 
 class SalesInvoiceLine(Base):
     __tablename__ = "sales_invoice_lines"

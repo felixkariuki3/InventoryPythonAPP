@@ -20,3 +20,4 @@ class Customer(Base):
     invoices = relationship("SalesInvoice", back_populates="customer")
     payments = relationship("Payment", back_populates="customer")
     credit_notes = relationship("CreditNote", back_populates="customer")
+    adjustments= relationship("SalesAdjustment", back_populates="customer")

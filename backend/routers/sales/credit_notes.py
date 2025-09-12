@@ -3,9 +3,9 @@ from sqlalchemy.orm import Session
 from typing import List
 from backend.dependencies import get_db
 from backend.schemas.sales.credit_notes import CreditNoteCreate, CreditNoteRead
-from services.sales import credit_notes as service
+from backend.services.sales import credit_notes as service
 
-router = APIRouter(prefix="/credit-notes", tags=["Credit Notes"])
+router = APIRouter(prefix="/sales/credit-notes", tags=["Credit Notes"])
 
 
 @router.post("/", response_model=CreditNoteRead)

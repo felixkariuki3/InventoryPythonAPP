@@ -13,6 +13,7 @@ class SalesOrderLineBase(BaseModel):
     tax_rate: Optional[Decimal] = 0
     discount_rate: Optional[Decimal] = 0
     warehouse_id: Optional[int] = None
+    line_total: Decimal
 
 
 class SalesOrderLineCreate(SalesOrderLineBase):
@@ -29,7 +30,10 @@ class SalesOrderLineRead(SalesOrderLineBase):
 
 class SalesOrderCreate(BaseModel):
     customer_id: int
+    order_date:date
+    due_date:Optional[date] = None
     remarks: Optional[str] = None
+    status: Optional[str] = None
     lines: List[SalesOrderLineCreate]
 
 class SalesOrderUpdate(BaseModel):
