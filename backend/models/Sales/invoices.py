@@ -14,6 +14,7 @@ class SalesInvoice(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     customer_id = Column(Integer, ForeignKey("customers.id", name="fk_si_customer_id"), nullable=False, index=True)
+    order_id = Column(Integer,ForeignKey("sales_orders.id",name ="fk_sales_orders_order_id"),index=True)
     invoice_date = Column(DateTime, default=datetime.utcnow)
     status = Column(String, default="DRAFT", index=True)     # DRAFT, POSTED, PARTIALLY_PAID, PAID, CANCELLED
     invoice_type = Column(String, default="CREDIT")          # CREDIT, CASH
@@ -27,6 +28,7 @@ class SalesInvoice(Base):
     lines = relationship("SalesInvoiceLine", back_populates="invoice", cascade="all, delete-orphan")
     allocations = relationship("PaymentAllocation", back_populates="invoice", cascade="all, delete-orphan")
     adjustments = relationship ("SalesAdjustment", back_populates="invoice")
+    order = relationship ("SalesOrder", back_populates ="invoice")
 
 class SalesInvoiceLine(Base):
     __tablename__ = "sales_invoice_lines"

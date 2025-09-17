@@ -34,7 +34,7 @@ class SalesOrder(Base):
     customer = relationship("Customer", back_populates="sales_orders")
     lines = relationship("SalesOrderLine", back_populates="order", cascade="all, delete-orphan")
     delivery_notes = relationship("DeliveryNote", back_populates="sales_order")
-
+    invoice = relationship("SalesInvoice", back_populates ="order")
 class SalesOrderLine(Base):
     __tablename__ = "sales_order_lines"
 

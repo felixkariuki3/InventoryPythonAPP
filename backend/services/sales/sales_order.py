@@ -43,10 +43,11 @@ class SalesOrderService:
                 warehouse_id=line_in.warehouse_id
             )
             db.add(line)
+            db.flush()
 
             # Reserve stock
             reservation = StockReservation(
-                sales_order_line_id=order.id,
+                sales_order_line_id=line.id,
                 item_id=line_in.item_id,
                 reserved_qty=line_in.ordered_qty,
                 created_at=datetime.utcnow(),
@@ -72,8 +73,26 @@ class SalesOrderService:
         order = db.query(SalesOrder).filter(SalesOrder.id == order_id).first()
         if not order:
             return None
-        for key, value in order_in.dict(exclude_unset=True).items():
+
+    # update scalar fields only
+        data = order_in.dict(exclude_unset=True, exclude={"lines", "reservations"})
+        for key, value in data.items():
             setattr(order, key, value)
+
+    # handle lines if provided
+        if order_in.lines is not None:
+            order.lines.clear()
+        for line_data in order_in.lines:
+            line = SalesOrderLine(**line_data.dict())
+            order.lines.append(line)
+
+    # handle reservations if provided
+        if order_in.reservations is not None and len(order_in.reservations) > 0:
+            order.reservations.clear()
+        for res_data in order_in.reservations:
+            reservation = StockReservation(**res_data.dict())
+            order.reservations.append(reservation)
+
         db.commit()
         db.refresh(order)
         return order
@@ -150,7 +169,7 @@ class SalesOrderService:
         for line in order.lines:
             transaction = InventoryTransaction(
                 item_id=line.item_id,
-                quantity=-line.quantity,
+                quantity=-line.ordered_quantity,
                 transaction_type="SALE",
                 reference=f"SO-{order.id}"
             )

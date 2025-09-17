@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import List, Optional
 
 from backend.models.Sales.invoices import SalesInvoice, SalesInvoiceLine
+from backend.models.Sales.sales_order import SalesOrder,SalesOrderLine
 from backend.schemas.sales.invoices import (
     SalesInvoiceCreate, SalesInvoiceUpdate
 )
@@ -34,6 +35,39 @@ def create_invoice(db: Session, invoice_in: SalesInvoiceCreate) -> SalesInvoice:
     db.refresh(invoice)
     return invoice
 
+def create_invoice_from_order(db: Session, order_id: int) -> Optional[SalesInvoice]:
+    """Generate a sales invoice from a sales order and its lines."""
+    order = db.query(SalesOrder).filter(SalesOrder.id == order_id).first()
+    if not order:
+        return None
+
+    # Create invoice header
+    invoice = SalesInvoice(
+        order_id=order.id,
+        customer_id=order.customer_id,
+        invoice_date=datetime.utcnow(),
+        status="POSTED",
+        total=order.total_amount,
+        balance=order.total_amount
+    )
+    db.add(invoice)
+    db.flush()  # get invoice.id before creating lines
+
+    # Create invoice lines from order lines
+    for line in order.lines:
+        db.add(SalesInvoiceLine(
+            invoice_id=invoice.id,
+            item_id=line.item_id,
+            qty=line.ordered_qty,
+            unit_price=line.unit_price,
+            tax_rate=line.tax_rate or 0,
+            discount_rate=line.discount_rate or 0
+        ))
+
+    # Commit
+    db.commit()
+    db.refresh(invoice)
+    return invoice
 
 def get_invoice(db: Session, invoice_id: int) -> Optional[SalesInvoice]:
     return db.query(SalesInvoice).filter(SalesInvoice.id == invoice_id).first()

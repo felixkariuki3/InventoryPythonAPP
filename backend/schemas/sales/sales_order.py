@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime,date
 from decimal import Decimal
+from backend.schemas.sales.reservations import ReservationUpdate
 
 # ---------------------------
 # Sales Order + Lines
@@ -43,6 +44,7 @@ class SalesOrderUpdate(BaseModel):
     status: Optional[str] = None
     # optionally allow line updates
     lines: Optional[List[SalesOrderLineCreate]] = None
+    reservations: Optional[List[ReservationUpdate]] = []
 
 class SalesOrderRead(BaseModel):
     id: int

@@ -29,7 +29,7 @@ def get_sales_invoice(invoice_id: int, db: Session = Depends(get_db)):
 
 @router.post("/{order_id}/invoice", response_model=SalesInvoiceRead)
 def generate_invoice_from_order(order_id: int, db: Session = Depends(get_db)):
-    invoice = accounting.post_invoice(db, order_id)
+    invoice = invoices.create_invoice_from_order(db, order_id)
     if not invoice:
         raise HTTPException(status_code=404, detail="Order not found")
     return invoice
