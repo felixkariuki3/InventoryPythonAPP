@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 from typing import List, Optional
 
-from backend.models.Sales.invoices import SalesInvoice, SalesInvoiceLine
+from backend.models.Sales.invoices import SalesInvoice, SalesInvoiceLine, InvoiceStatus
 from backend.models.Sales.sales_order import SalesOrder,SalesOrderLine
 from backend.schemas.sales.invoices import (
     SalesInvoiceCreate, SalesInvoiceUpdate
@@ -14,7 +14,7 @@ def create_invoice(db: Session, invoice_in: SalesInvoiceCreate) -> SalesInvoice:
     invoice = SalesInvoice(
         customer_id=invoice_in.customer_id,
         invoice_date=invoice_in.invoice_date or datetime.utcnow(),
-        status=invoice_in.status or "DRAFT",
+        status=invoice_in.status,
         total=invoice_in.total,
         balance=invoice_in.balance or invoice_in.total
     )

@@ -23,5 +23,5 @@ def release_reservation(reservation_id: int, db: Session = Depends(get_db)):
     return ReservationService.release_reservation(db, reservation_id)
 
 @router.get("/", response_model=List[ReservationRead])
-def list_reservations(order_line_id: int = None, db: Session = Depends(get_db)):
-    return ReservationService.list_reservations(db, order_line_id)
+def list_reservations(sales_order_line_id: int = None, db: Session = Depends(get_db)):
+    return ReservationService.list_reservations(db, sales_order_line_id)

@@ -1,3 +1,4 @@
+from enum import Enum
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
@@ -7,6 +8,11 @@ from decimal import Decimal
 # ---------------------------
 # CREATE SCHEMAS
 # ---------------------------
+class InvoiceStatus(str, Enum):
+    OPEN = "OPEN"
+    PARTIAL = "PARTIAL"
+    PAID = "PAID"
+    
 class SalesInvoiceLineCreate(BaseModel):
     item_id: str
     qty: Decimal
@@ -18,7 +24,7 @@ class SalesInvoiceLineCreate(BaseModel):
 class SalesInvoiceCreate(BaseModel):
     customer_id: int
     invoice_date: Optional[datetime] = None
-    status: Optional[str] = "DRAFT"
+    status: Optional[InvoiceStatus] = None
     total: Decimal
     balance: Optional[Decimal] = None
     lines: List[SalesInvoiceLineCreate]
@@ -57,6 +63,6 @@ class SalesInvoiceRead(BaseModel):
 # ---------------------------
 class SalesInvoiceUpdate(BaseModel):
     invoice_date: Optional[datetime] = None
-    status: Optional[str] = None
+    status: Optional[InvoiceStatus] = None
     total: Optional[Decimal] = None
     balance: Optional[Decimal] = None

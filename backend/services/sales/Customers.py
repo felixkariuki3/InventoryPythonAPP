@@ -30,7 +30,8 @@ def get_customer(db: Session, customer_id: int):
 def update_customer(db: Session, customer_id: int, update_data: CustomerUpdate):
     customer = get_customer(db, customer_id)
     for field, value in update_data.dict(exclude_unset=True).items():
-        setattr(customer, field, value)
+        if value is not None: 
+            setattr(customer, field, value)
 
     db.commit()
     db.refresh(customer)
@@ -39,6 +40,8 @@ def update_customer(db: Session, customer_id: int, update_data: CustomerUpdate):
 
 def delete_customer(db: Session, customer_id: int):
     customer = get_customer(db, customer_id)
+    if customer.sales_orders:   # check relationship
+        raise ValueError("Cannot delete customer with existing sales orders")
     db.delete(customer)
     db.commit()
     return {"detail": "Customer deleted"}

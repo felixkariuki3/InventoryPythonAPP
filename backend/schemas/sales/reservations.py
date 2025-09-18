@@ -7,7 +7,7 @@ from decimal import Decimal
 # Stock Reservations
 # ---------------------------
 class ReservationBase(BaseModel):
-    order_line_id: int
+    sales_order_line_id: int
     item_id: int
     reserved_qty: Decimal
 
@@ -20,7 +20,7 @@ class ReservationUpdate(BaseModel):
 
 class ReservationRead(ReservationBase):
     id: int
-    reserved_date: datetime
+    created_at: datetime
     status: str
 
     class Config:

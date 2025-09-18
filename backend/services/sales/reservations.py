@@ -34,8 +34,8 @@ class ReservationService:
         return reservation
 
     @staticmethod
-    def list_reservations(db: Session, order_line_id: int = None):
+    def list_reservations(db: Session, sales_order_line_id: int = None):
         query = db.query(StockReservation)
-        if order_line_id:
-            query = query.filter(StockReservation.sales_order_line_id == order_line_id)
+        if sales_order_line_id:
+            query = query.filter(StockReservation.sales_order_line_id == sales_order_line_id)
         return query.all()

@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional
 from datetime import datetime,date
 from decimal import Decimal
@@ -6,6 +6,7 @@ from decimal import Decimal
 # ---------------------------
 # Payments + Allocations
 # ---------------------------
+
 class PaymentAllocationBase(BaseModel):
     invoice_id: int
     amount_applied: Decimal
@@ -32,7 +33,7 @@ class PaymentBase(BaseModel):
 
 
 class PaymentCreate(PaymentBase):
-    allocations: List[PaymentAllocationCreate] = []
+    allocations: List[PaymentAllocationCreate] = Field(default_factory=list)
 
 
 class PaymentUpdate(BaseModel):
@@ -41,12 +42,13 @@ class PaymentUpdate(BaseModel):
     reference: Optional[str]
     amount: Optional[Decimal]
     notes: Optional[str]
-
+    allocations: List[PaymentAllocationCreate] = Field(default_factory=list)
 
 class PaymentRead(PaymentBase):
     id: int
     unallocated_amount: Decimal
     allocations: List[PaymentAllocationRead] = []
+
 
     class Config:
         orm_mode = True

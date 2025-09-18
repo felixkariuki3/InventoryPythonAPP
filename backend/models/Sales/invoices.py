@@ -1,7 +1,9 @@
+
 from sqlalchemy import (
     Column, Integer, Numeric, String, Float, DateTime, ForeignKey, Text, func
 )
-from enum import Enum
+from enum import Enum as PyEnum
+from sqlalchemy import Enum
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from backend.database import Base
@@ -9,6 +11,11 @@ from backend.database import Base
 # ---------------------------
 # Sales Invoices
 # ---------------------------
+class InvoiceStatus(PyEnum):
+    OPEN = "OPEN"
+    PARTIAL = "PARTIAL"
+    PAID = "PAID"
+
 class SalesInvoice(Base):
     __tablename__ = "sales_invoices"
 
@@ -16,7 +23,7 @@ class SalesInvoice(Base):
     customer_id = Column(Integer, ForeignKey("customers.id", name="fk_si_customer_id"), nullable=False, index=True)
     order_id = Column(Integer,ForeignKey("sales_orders.id",name ="fk_sales_orders_order_id"),index=True)
     invoice_date = Column(DateTime, default=datetime.utcnow)
-    status = Column(String, default="DRAFT", index=True)     # DRAFT, POSTED, PARTIALLY_PAID, PAID, CANCELLED
+    status = Column(Enum(InvoiceStatus,name="invoice_status"), default=InvoiceStatus.OPEN, nullable=False)
     invoice_type = Column(String, default="CREDIT")          # CREDIT, CASH
     subtotal = Column(Float, default=0, nullable=False)
     tax_total = Column(Float, default=0, nullable=False)

@@ -77,7 +77,8 @@ class SalesOrderService:
     # update scalar fields only
         data = order_in.dict(exclude_unset=True, exclude={"lines", "reservations"})
         for key, value in data.items():
-            setattr(order, key, value)
+            if value is not None: 
+                setattr(order, key, value)
 
     # handle lines if provided
         if order_in.lines is not None:

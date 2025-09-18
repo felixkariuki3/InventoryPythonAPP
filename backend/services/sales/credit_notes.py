@@ -31,7 +31,7 @@ def create_credit_note(db: Session, credit_note_data: CreditNoteCreate):
         subtotal=subtotal,
         tax_total=tax_total,
         total=total,
-        status="DRAFT"
+        status=""
     )
     db.add(db_credit_note)
     db.flush()  # Get ID before adding lines
