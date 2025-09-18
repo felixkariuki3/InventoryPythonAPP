@@ -13,3 +13,4 @@ Base = declarative_base()
 
 from backend.models import item, warehouse,bom,production_order,purchase,uom,uom_conversion,stock_transaction,inventory,wip
 from backend.models.Sales import reservations,returns,invoices,sales_order,credit_notes,customers,adjustments,accounting,dnotes,payments
+from backend.models.finance import finance
