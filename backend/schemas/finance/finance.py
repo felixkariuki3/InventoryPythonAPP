@@ -62,6 +62,12 @@ class AccountBase(BaseModel):
 class AccountCreate(AccountBase):
     pass
 
+class AccountUpdate(AccountBase):
+    name: Optional[str] = None
+    type: Optional[AccountType] = None
+    reporting_group_id: Optional[int] = None
+    parent_id: Optional[int] = None
+    is_active: Optional[bool] = None
 
 class AccountOut(AccountBase):
     id: int

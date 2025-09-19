@@ -13,6 +13,7 @@ from backend.routers import wip
 from backend.routers import uom
 from backend.routers import purchase
 from backend.routers.sales import sales_order,adjustments,accounting,credit_notes,customers,dnotes,invoices,payments,reservations,returns
+from backend.routers.finance import finance
 
 
 setup_logging()
@@ -48,6 +49,7 @@ app.include_router(invoices.router)
 app.include_router(payments.router)
 app.include_router(reservations.router)
 app.include_router(returns.router)
+app.include_router(finance.router)
 
 
 @app.get("/")
