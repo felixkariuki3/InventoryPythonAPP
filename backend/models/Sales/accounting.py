@@ -1,43 +1,58 @@
 from sqlalchemy import (
-    Column, Integer, Numeric, String, Float, DateTime, ForeignKey, Text, func
+    Column, Date, Integer, Numeric, String, Float, DateTime, ForeignKey, Text, func
 )
 from enum import Enum
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from datetime import date, datetime
 from backend.database import Base
 
 class AccountingEvent(Base):
     __tablename__ = "accounting_events"
 
     id = Column(Integer, primary_key=True, index=True)
-    event_type = Column(String, nullable=False)  # e.g. SO_CONFIRM, INVOICE, PAYMENT, RETURN
-    reference_id = Column(Integer, nullable=False)  # points to SO, invoice, payment etc.
-    reference_table = Column(String, nullable=False)  # "sales_orders", "sales_invoices", etc.
+    batch_no = Column(String, unique=True, index=True, nullable=False)
+    source_module = Column(String, nullable=False)  # SALES, PROCUREMENT, INVENTORY, CASHBOOK, etc.
+    reference_id = Column(Integer, nullable=True)   # optional link back to SO, PO, etc.
+    reference_table = Column(String, nullable=False)
+    description = Column(String, nullable=True)
     amount = Column(Float, nullable=False, default=0)
     debit_account = Column(String)
     credit_account = Column(String)
     currency = Column(String, default="KES")
-    status = Column(String, default="PENDING")  # to be picked by accounting processor
+    status = Column(String, default="draft")  # draft, posted, reversed
     created_at = Column(DateTime, default=datetime.utcnow)
+    posted_at = Column(DateTime, nullable=True)
+
+    entries = relationship("JournalEntry", back_populates="batch")
+
 
 class JournalEntry(Base):
     __tablename__ = "journal_entries"
 
     id = Column(Integer, primary_key=True, index=True)
-    reference = Column(String, index=True)
+    batch_id = Column(Integer, ForeignKey("journal_batches.id"), nullable=False)
+    entry_number = Column(String, index=True, nullable=False)  # sequential within batch
+    entry_date = Column(Date, default=date.today, nullable=False)
     description = Column(String, nullable=True)
-    entry_date = Column(DateTime, default=datetime.utcnow)
+    total_debit = Column(Numeric(18, 2), default=0)
+    total_credit = Column(Numeric(18, 2), default=0)
+    status = Column(String, default="draft")  # draft / posted / cancelled
 
-    lines = relationship("JournalLine", back_populates="journal")
+    # relationships
+    batch = relationship("JournalBatch", back_populates="entries")
+    lines = relationship("JournalLine", back_populates="entry", cascade="all, delete-orphan")
 
 
 class JournalLine(Base):
     __tablename__ = "journal_lines"
 
     id = Column(Integer, primary_key=True, index=True)
-    journal_id = Column(Integer, ForeignKey("journal_entries.id"))
-    account = Column(String, index=True)
-    debit = Column(Numeric(12, 2), default=0)
-    credit = Column(Numeric(12, 2), default=0)
+    entry_id = Column(Integer, ForeignKey("journal_entries.id"), nullable=False)
+    account_id = Column(Integer, ForeignKey("chart_of_accounts.id"), nullable=False)
+    description = Column(String, nullable=True)
+    debit = Column(Numeric(18, 2), default=0)
+    credit = Column(Numeric(18, 2), default=0)
 
-    journal = relationship("JournalEntry", back_populates="lines")
+    # relationships
+    entry = relationship("JournalEntry", back_populates="lines")
+    account = relationship("ChartOfAccount")
