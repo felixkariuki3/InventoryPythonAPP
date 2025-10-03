@@ -36,8 +36,8 @@ class Account(Base):
     code = Column(String, unique=True, nullable=False)
     name = Column(String, nullable=False)
     type = Column(Enum(AccountType), nullable=False)
-    parent_account_id = Column(Integer, ForeignKey("accounts.id"), nullable=True)
-    reporting_group_id = Column(Integer, ForeignKey("reporting_groups.id"), nullable=True)
+    parent_account_id = Column(Integer, ForeignKey("accounts.id", name="fk_accounts_parent_account_id"), nullable=True)
+    reporting_group_id = Column(Integer, ForeignKey("reporting_groups.id", name="fk_accounts_reporting_group_id"), nullable=True)
     is_control_account = Column(Boolean, default=False)
     currency = Column(String, default="KES")  # or USD, multi-currency support
     is_active = Column(Boolean, default=True)
@@ -45,6 +45,7 @@ class Account(Base):
 
     parent = relationship("Account", remote_side=[id], backref="children")
     reporting_group = relationship("ReportingGroup", back_populates="accounts")
+    lines = relationship ("journal_lines", back_populates="account")
 
 
 class DimensionType(str, enum.Enum):
