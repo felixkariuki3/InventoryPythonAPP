@@ -2,9 +2,9 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from backend.dependencies import get_db
-from backend.models.Sales.accounting import JournalEntry, JournalLine
+from backend.models.finance.accounting import JournalEntry, JournalLine
 from backend.services.sales.accounting import SalesAccountingService
-from backend.schemas.sales.accounting import (
+from backend.schemas.finance.accounting import (
     JournalEntryRead,
     JournalLineRead
 )
