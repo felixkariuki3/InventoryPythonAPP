@@ -17,9 +17,20 @@ class JournalEntryCreate(BaseModel):
     description: Optional[str] = None
     lines: List[JournalLineCreate]
 
+class JournalEntryUpdate(BaseModel):
+    batch_id: Optional[int] = None  # optional: attach to existing batch/event
+    entry_date: Optional[date] = None
+    description: Optional[str] = None
+    status: Optional[str] = None
+    lines: List[JournalLineCreate]
+
 class JournalLineRead(JournalLineCreate):
     id: int
     entry_id: int
+    account_id: int
+    description: str
+    debit: float
+    credit: float
 
     class Config:
         orm_mode = True
@@ -28,7 +39,7 @@ class JournalLineRead(JournalLineCreate):
 
 class JournalEntryRead(BaseModel):
     id: int
-    batch_id: Optional[int]
+    batch_no: Optional[int]
     entry_number: str
     entry_date: date
     description: Optional[str]
@@ -39,3 +50,22 @@ class JournalEntryRead(BaseModel):
 
     class Config:
         orm_mode = True
+class JournalBatchRead(BaseModel):
+    id: int
+    batch_no: str
+    source_module: str
+    description: str
+    status: str
+    posted_at: Optional[str]
+    entries: List[JournalEntryRead]
+
+    class Config:
+        orm_mode = True
+
+class PostJournalEntryResponse(BaseModel):
+    message: str
+    entry: JournalEntryRead
+
+class PostJournalBatchResponse(BaseModel):
+    message: str
+    batch: JournalBatchRead

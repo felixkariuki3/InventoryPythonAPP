@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from backend.models.finance.finance import Account,AccountType
-from backend.schemas.finance.finance import Account,AccountType,AccountCreate,AccountUpdate
+from backend.schemas.finance.finance import AccountCreate,AccountUpdate
 
 
 def create_account(db: Session, account_in: AccountCreate):

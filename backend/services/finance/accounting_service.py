@@ -1,8 +1,11 @@
 from datetime import date, datetime
+from http.client import HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from backend.models.finance.accounting import AccountingEvent, JournalEntry, JournalLine
 from backend.models.finance.finance import Account
+from backend.services.finance.journal_batch_service import create_journal_batch
+from backend.services.finance.journal_entry import check_batch_posting_status, generate_entry_number
 
 
 def create_accounting_event(
@@ -12,15 +15,15 @@ def create_accounting_event(
     reference_id: int,
     description: str,
     amount: float,
-    debit_account_id: int,
-    credit_account_id: int,
-):
+    debit_account: int,
+    credit_account: int,
+) -> AccountingEvent:
     """
-    Creates an AccountingEvent and the corresponding JournalEntry and JournalLines.
+    Creates an AccountingEvent, a JournalEntry, and corresponding JournalLines.
+    Ensures all entries belong to a batch.
     """
-
+    # --- 1. Create Accounting Event ---
     try:
-        # --- 1. Create the Accounting Event (Batch) ---
         event = AccountingEvent(
             batch_no=f"{source_module[:3].upper()}-{int(datetime.utcnow().timestamp())}",
             source_module=source_module,
@@ -28,53 +31,63 @@ def create_accounting_event(
             reference_id=reference_id,
             description=description,
             amount=amount,
-            debit_account=debit_account_id,
-            credit_account=credit_account_id,
+            debit_account=debit_account,
+            credit_account=credit_account,
+            currency="KES",
             status="draft",
         )
         db.add(event)
         db.commit()
         db.refresh(event)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error creating accounting event: {str(e)}")
 
-        # --- 2. Create the Journal Entry ---
-        entry = JournalEntry(
-            batch_no=event.id,
-            entry_number=f"JE-{event.id}",
-            entry_date=date.today(),
-            description=description,
-            total_debit=amount,
-            total_credit=amount,
-            status="draft",
-        )
-        db.add(entry)
+    # --- 2. Ensure a Batch exists ---
+    batch = create_journal_batch(
+        db=db,
+        source_module=source_module,
+        description=f"{description} (auto-batch)"
+    )
+
+    # --- 3. Create Journal Entry ---
+    entry = JournalEntry(
+        batch_no=batch.id,
+        entry_number=generate_entry_number(db),
+        entry_date=date.today(),
+        description=description,
+        total_debit=amount,
+        total_credit=amount,
+        status="draft",
+    )
+    db.add(entry)
+    db.flush()  # Get entry ID
+
+    # --- 4. Create Journal Lines ---
+    debit_line = JournalLine(
+        entry_id=entry.id,
+        account_id=debit_account,
+        description=f"Debit {description}",
+        debit=amount,
+        credit=0,
+    )
+    credit_line = JournalLine(
+        entry_id=entry.id,
+        account_id=credit_account,
+        description=f"Credit {description}",
+        debit=0,
+        credit=amount,
+    )
+    db.add_all([debit_line, credit_line])
+
+    try:
         db.commit()
         db.refresh(entry)
-
-        # --- 3. Create Journal Lines (Debit and Credit) ---
-        debit_line = JournalLine(
-            entry_id=entry.id,
-            account_id=debit_account_id,
-            description=f"Debit {description}",
-            debit=amount,
-            credit=0,
-        )
-        credit_line = JournalLine(
-            entry_id=entry.id,
-            account_id=credit_account_id,
-            description=f"Credit {description}",
-            debit=0,
-            credit=amount,
-        )
-
-        db.add_all([debit_line, credit_line])
-        db.commit()
-
-        return {"status": "success", "event_id": event.id, "entry_id": entry.id}
-
-    except SQLAlchemyError as e:
+    except Exception as e:
         db.rollback()
-        raise Exception(f"Error creating accounting event: {e}")
+        raise HTTPException(status_code=500, detail=f"Error creating journal entry: {str(e)}")
 
+    return event
 
 def validate_journal_entry(db: Session, entry_id: int) -> bool:
     """
@@ -112,19 +125,20 @@ def post_journal_entry(db: Session, entry_id: int):
     entry.batch.posted_at = datetime.utcnow()
 
     db.commit()
-    return {"status": "posted", "entry_number": entry.entry_number}
+    return entry
 
 
-def reverse_journal_entry(db: Session, entry_id: int):
+def reverse_journal_entry(db: Session, entry_id: int) -> JournalEntry:
     """
     Reverses a posted journal entry by creating a new opposite entry.
     """
-    entry = db.query(JournalEntry).filter(JournalEntry.id == entry_id).first()
+    entry: JournalEntry = db.query(JournalEntry).filter(JournalEntry.id == entry_id).first()
     if not entry:
-        raise Exception(f"Journal entry {entry_id} not found.")
+        raise HTTPException(status_code=404, detail=f"Journal entry {entry_id} not found")
     if entry.status != "posted":
-        raise Exception(f"Only posted entries can be reversed.")
+        raise HTTPException(status_code=400, detail="Only posted entries can be reversed")
 
+    # Create the reversed entry
     reversed_entry = JournalEntry(
         batch_no=entry.batch_no,
         entry_number=f"{entry.entry_number}-REV",
@@ -132,11 +146,10 @@ def reverse_journal_entry(db: Session, entry_id: int):
         description=f"Reversal of {entry.entry_number}",
         total_debit=entry.total_credit,
         total_credit=entry.total_debit,
-        status="posted",
+        status="posted",  # Immediately posted
     )
     db.add(reversed_entry)
-    db.commit()
-    db.refresh(reversed_entry)
+    db.flush()  # Get ID
 
     # Reverse each line
     reversed_lines = []
@@ -150,7 +163,17 @@ def reverse_journal_entry(db: Session, entry_id: int):
                 credit=line.debit,
             )
         )
-
     db.add_all(reversed_lines)
-    db.commit()
-    return {"status": "reversed", "entry_number": reversed_entry.entry_number}
+
+    # Commit and refresh
+    try:
+        db.commit()
+        db.refresh(reversed_entry)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error reversing entry: {str(e)}")
+
+    # Update batch status automatically
+    check_batch_posting_status(db, reversed_entry.batch_no)
+
+    return reversed_entry

@@ -45,7 +45,7 @@ class Account(Base):
 
     parent = relationship("Account", remote_side=[id], backref="children")
     reporting_group = relationship("ReportingGroup", back_populates="accounts")
-    lines = relationship ("journal_lines", back_populates="account")
+    Slines = relationship ("JournalLine", back_populates="account")
 
 
 class DimensionType(str, enum.Enum):

@@ -10,7 +10,7 @@ class AccountingEvent(Base):
     __tablename__ = "accounting_events"
 
     id = Column(Integer, primary_key=True, index=True)
-    batch_no = Column(String, unique=True, index=True, nullable=False)
+    batch_no = Column(Integer, ForeignKey("journal_batches.id"), nullable=True)
     source_module = Column(String, nullable=False)  # SALES, PROCUREMENT, INVENTORY, CASHBOOK, etc.
     reference_id = Column(Integer, nullable=True)   # optional link back to SO, PO, etc.
     reference_table = Column(String, nullable=False)
@@ -23,14 +23,14 @@ class AccountingEvent(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     posted_at = Column(DateTime, nullable=True)
 
-    entries = relationship("JournalEntry", back_populates="batch")
+    batch = relationship("JournalBatch", backref="events")
 
 
 class JournalEntry(Base):
     __tablename__ = "journal_entries"
 
     id = Column(Integer, primary_key=True, index=True)
-    batch_no = Column(Integer, ForeignKey("accounting_events.id",name="fk_journal_entries_batch_no"), nullable=False)
+    batch_no = Column(Integer, ForeignKey("journal_batches.id",name="fk_journal_entries_batch_no"), nullable=False)
     entry_number = Column(String, index=True, nullable=False)  # sequential within batch
     entry_date = Column(Date, default=date.today, nullable=False)
     description = Column(String, nullable=True)

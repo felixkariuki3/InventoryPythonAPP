@@ -11,11 +11,11 @@ from backend.models.finance.accounting import JournalEntry, JournalLine, Account
 from backend.schemas.finance.accounting import (
     AccountingEventCreate,AccountingEventRead
 )
-from backend.schemas.finance.journal_entry import JournalEntryRead, JournalLineRead
+from backend.schemas.finance.journal_entry import JournalEntryRead, JournalLineRead, PostJournalEntryResponse
 
 router = APIRouter(
     prefix="/accounting",
-    tags=["Accounting & Journals"],
+    tags=["Accounting & Journals"]
 )
 
 
@@ -35,10 +35,10 @@ def create_event(payload: AccountingEventCreate, db: Session = Depends(get_db)):
             reference_id=payload.reference_id,
             description=payload.description,
             amount=payload.amount,
-            debit_account_id=payload.debit_account_id,
-            credit_account_id=payload.credit_account_id,
+            debit_account=payload.debit_account,
+            credit_account=payload.credit_account,
         )
-        return {"message": "Accounting event created successfully", **result}
+        return result
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
@@ -56,7 +56,7 @@ def post_entry(entry_id: int, db: Session = Depends(get_db)):
     """
     try:
         result = post_journal_entry(db, entry_id)
-        return {"message": "Journal entry posted successfully", **result}
+        return result
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
@@ -67,20 +67,13 @@ def post_entry(entry_id: int, db: Session = Depends(get_db)):
 # ---------------------------------------------------------------------
 # 3️⃣ Reverse Journal Entry
 # ---------------------------------------------------------------------
-@router.post("/reverse-entry/{entry_id}", response_model=JournalEntryRead)
-def reverse_entry(entry_id: int, db: Session = Depends(get_db)):
-    """
-    Reverse a posted journal entry by creating a new reversed entry.
-    """
-    try:
-        result = reverse_journal_entry(db, entry_id)
-        return {"message": "Journal entry reversed successfully", **result}
-    except SQLAlchemyError as e:
-        db.rollback()
-        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
+@router.post("/journal-entry/{entry_id}/reverse", response_model=PostJournalEntryResponse)
+def api_reverse_journal_entry(entry_id: int, db: Session = Depends(get_db)):
+    reversed_entry = reverse_journal_entry(db, entry_id)
+    return {
+        "message": f"Journal entry {reversed_entry.entry_number} created as reversal",
+        "entry": reversed_entry
+    }
 
 # ---------------------------------------------------------------------
 # 4️⃣ Get All Journal Entries

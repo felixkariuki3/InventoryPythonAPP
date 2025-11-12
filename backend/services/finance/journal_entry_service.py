@@ -3,56 +3,35 @@ from sqlalchemy.exc import SQLAlchemyError
 from fastapi import HTTPException
 from pytest import Session
 from backend.models.finance.accounting import AccountingEvent, JournalEntry
+from backend.services.finance.journal_entry import check_batch_posting_status
 
 
-def post_journal_entry(db: Session, entry_id: int):
+def post_journal_entry(db: Session, entry_id: int) -> JournalEntry:
     """
-    Posts a journal entry:
-    - Validates that debits == credits
-    - Marks the journal as 'posted'
-    - Creates an AccountingEvent record for tracking
+    Posts a single journal entry:
+    - Validates debit/credit balance
+    - Marks entry as posted
+    - Updates batch status if all entries posted
     """
-    db_entry = db.query(JournalEntry).filter(JournalEntry.id == entry_id).first()
-    if not db_entry:
+    entry: JournalEntry = db.query(JournalEntry).filter(JournalEntry.id == entry_id).first()
+    if not entry:
         raise HTTPException(status_code=404, detail="Journal entry not found")
-
-    if db_entry.status == "posted":
+    if entry.status == "posted":
         raise HTTPException(status_code=400, detail="Entry already posted")
 
-    # Validation: totals
-    total_debit = db_entry.total_debit or 0
-    total_credit = db_entry.total_credit or 0
-
-    if round(total_debit, 2) != round(total_credit, 2):
+    # Validate totals
+    if round(entry.total_debit or 0, 2) != round(entry.total_credit or 0, 2):
         raise HTTPException(
             status_code=400,
-            detail=f"Unbalanced entry cannot be posted: Debit {total_debit} != Credit {total_credit}",
+            detail=f"Unbalanced entry: Debit {entry.total_debit} != Credit {entry.total_credit}",
         )
 
-    # Create Accounting Event (batch summary)
-    event = AccountingEvent(
-        batch_no=db_entry.batch_no,
-        source_module="GENERAL_LEDGER",
-        reference_id=db_entry.id,
-        reference_table="journal_entries",
-        description=db_entry.description,
-        amount=total_debit,
-        debit_account=None,  # optional, since we have detailed lines
-        credit_account=None,
-        status="posted",
-        created_at=db_entry.entry_date,
-        posted_at=datetime.utcnow(),
-    )
-    db.add(event)
+    # Mark entry posted
+    entry.status = "posted"
+    db.commit()
+    db.refresh(entry)
 
-    # Update journal status
-    db_entry.status = "posted"
+    # Update batch status automatically
+    check_batch_posting_status(db, entry.batch_no)
 
-    try:
-        db.commit()
-        db.refresh(db_entry)
-    except SQLAlchemyError as e:
-        db.rollback()
-        raise HTTPException(status_code=500, detail=f"Error posting journal entry: {str(e)}")
-
-    return {"message": f"Journal Entry {db_entry.entry_number} posted successfully", "id": db_entry.id}
+    return entry
